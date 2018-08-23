@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 public class MemberList {
 	
@@ -16,10 +18,16 @@ public class MemberList {
 			ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
 			HashMap<String, MemberDTO> members = (HashMap<String, MemberDTO>) in.readObject();
 			
-//			for(int i=0;i<members.size();i++) {
-//				
-//			}
-			System.out.println(members.size());
+			System.out.printf("등록된 회원 수: %d 명\n", members.size());
+			
+			Set<String> keySet = members.keySet();
+			Iterator<String> keyIterator = keySet.iterator();
+			while(keyIterator.hasNext()) {
+				String key = keyIterator.next();
+				MemberDTO member = members.get(key);
+				System.out.printf("id: %s // pw: %s // name: %s // age: %s // phone: %s // address: %s // count: %s\n", 
+						key, member.getPw(), member.getName(), member.getAge(), member.getPhoneNum(), member.getAddress(), member.getCountRentalBook());
+			}
 			
 			
 		} catch (IOException | ClassNotFoundException e) {
