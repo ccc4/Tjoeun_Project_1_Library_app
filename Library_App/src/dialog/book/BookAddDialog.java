@@ -1,4 +1,4 @@
-package dialog;
+package dialog.book;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -43,7 +44,9 @@ public class BookAddDialog extends JDialog {
 		JPanel centerPanel = new JPanel(new GridLayout(1, 2));
 		JPanel botPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		
-		JPanel writePanel = new JPanel(new GridLayout(3, 1));
+//		JPanel writePanel = new JPanel(new GridLayout(3, 1));
+		JPanel writePanel = new JPanel();
+		writePanel.setLayout(new BoxLayout(writePanel, BoxLayout.Y_AXIS));
 		imagePanel = new JPanel();  // 이미지가 들어오면 다시 변경해야함.
 		centerPanel.add(writePanel);
 		centerPanel.add(imagePanel);
@@ -77,7 +80,7 @@ public class BookAddDialog extends JDialog {
 		imagePanel.setOpaque(true);
 		imagePanel.setBackground(Color.LIGHT_GRAY);
 		
-		setSize(300, 200);
+		setSize(300, 230);
 		setLocationRelativeTo(null);
 		
 		

@@ -1,4 +1,4 @@
-package dialog;
+package dialog.member;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;

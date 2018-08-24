@@ -1,9 +1,10 @@
-package dialog;
+package dialog.member;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -15,12 +16,22 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import mainFrame.MainFrame;
+import member.MemberDTO;
+import member.MemberDAO;
 
-public class AdminLoginDialog extends JDialog {
-	private static final String ADMIN_ID = "abcd";
-	private static final String ADMIN_PW = "1234";
-	
-	public AdminLoginDialog(MainFrame frame, String title) {
+public class MemLoginDialog extends JDialog {
+	MemberDAO memberDAO;
+//	HashMap<String, MemberDTO> membersMap;
+
+	public void setMembers(MemberDAO memberDAO) {
+		this.memberDAO = memberDAO;
+	}
+//	
+//	public void setMembersMap(HashMap<String, MemberDTO> membersMap) {
+//		this.membersMap = membersMap;
+//	}
+
+	public MemLoginDialog(MainFrame frame, String title) {
 		super(frame, title, true);
 		
 		JPanel centerPanel = new JPanel(new BorderLayout());
@@ -55,7 +66,6 @@ public class AdminLoginDialog extends JDialog {
 		
 		
 		
-		
 		ExitBtn.addActionListener(new ActionListener() {
 			
 			@Override
@@ -71,12 +81,22 @@ public class AdminLoginDialog extends JDialog {
 				String id = idField.getText();
 				String pw = pwField.getText();
 				
-				if(id.equals(ADMIN_ID) && pw.equals(ADMIN_PW)) {
-					frame.admin_Login();
-					frame.check_Admin_Login();
-					setVisible(false);
+				if(memberDAO.checkExist(id)) {
+					HashMap<String, MemberDTO> membersMap = memberDAO.getMembers();
+					MemberDTO member = membersMap.get(id);
+					if(member.getPw().equals(pw)) {
+						JOptionPane.showMessageDialog(null, "로그인 성공!", "Login Success", JOptionPane.INFORMATION_MESSAGE);
+						frame.member_Login_Success(id);
+						frame.check_Member_Login();
+						setVisible(false);
+						
+					} else {
+						JOptionPane.showMessageDialog(null, "로그인 실패!\n비밀번호 틀림", "Login Fail", JOptionPane.WARNING_MESSAGE);
+						return;
+					}
 				} else {
-					JOptionPane.showMessageDialog(null, "로그인 실패!", "Login Fail", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "로그인 실패!\n아이디 확인 필요", "Login Fail", JOptionPane.WARNING_MESSAGE);
+					return;
 				}
 			}
 		});

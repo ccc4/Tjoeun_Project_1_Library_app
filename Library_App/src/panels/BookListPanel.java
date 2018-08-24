@@ -39,7 +39,7 @@ public class BookListPanel extends JPanel {
 		centerPanel.add(tablePanel);
 		centerPanel.add(bookImgLabel);
 		
-		centerPanel.setDividerLocation(450);
+		centerPanel.setDividerLocation(300);
 		centerPanel.setEnabled(false);
 	}
 }

@@ -18,29 +18,33 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 
 import book.BookDAO;
 import book.BookDTO;
 import book.BookList;
-import dialog.AdminLoginDialog;
-import dialog.BookAddDialog;
-import dialog.MemJoinDialog;
-import dialog.MemLoginDialog;
+import dialog.admin.AdminLoginDialog;
+import dialog.book.BookAddDialog;
+import dialog.member.MemJoinDialog;
+import dialog.member.MemLoginDialog;
+import dialog.member.MemModifyDialog;
 import member.MemberDTO;
 import member.MemberList;
 import panels.BookListPanel;
-import panels.MemModifyPanel;
 import member.MemberDAO;
 
 public class MainFrame extends JFrame {
 
+	JLabel welcomeLabel = new JLabel("로그인 해주세요.");
 	// 회원 관련
 	JButton memLoginBtn = new JButton("로그인");
 	JButton memJoinBtn = new JButton("회원가입");
+	JButton memModifyBtn = new JButton("정보수정");
 	JButton memLogoutBtn = new JButton("로그아웃");
-	JPanel memLoginPanel = new JPanel(new GridLayout(1, 3));
+	JPanel memLoginPanel = new JPanel(new GridLayout(2, 2));
+	JPanel welcomePanel = new JPanel(new BorderLayout());
 	
-	MemModifyPanel memModifyPanel;
+//	MemModifyPanel memModifyPanel;
 	JPanel memTopPanel = new JPanel(new BorderLayout());
 	
 	JButton memRentalInfoTest = new JButton("대여정보");
@@ -48,7 +52,7 @@ public class MainFrame extends JFrame {
 	JButton memServInfoTest = new JButton("예약정보");
 //	JPanel memServInfoPanel = new JPanel();
 	JPanel memBottomPanel = new JPanel(new GridLayout(2, 1));
-	JPanel memPanel = new JPanel(new GridLayout(2, 1));
+	JPanel memPanel = new JPanel(new BorderLayout());
 	
 	
 	// 책 관련
@@ -88,10 +92,12 @@ public class MainFrame extends JFrame {
 	// 메인 필드
 	String sessionID;
 	String sessionAdmin;
+	
 	MemberDAO memberDAO;
 	HashMap<String, MemberDTO> membersMap;
+	
 	BookDAO bookDAO;
-	HashMap<String, BookDTO> booksMap;
+//	HashMap<String, BookDTO> booksMap; // 안쓰인다
 	
 	// -------------------------------------------------------------------
 	
@@ -102,44 +108,45 @@ public class MainFrame extends JFrame {
 		memberDAO = new MemberDAO();
 		bookDAO = new BookDAO();
 		
-
+		// --------------------------------------------------------
+		// 메뉴바 구현
+		
 		optionMenu.add(adminLogin);
 		menubar.add(optionMenu);
 		adminMenu.add(adminLogout);
 		adminMenu.add(bookMenu);
 		bookMenu.add(listBook);
+		bookMenu.addSeparator();
 		bookMenu.add(addBook);
 		bookMenu.add(modBook);
 		bookMenu.add(delBook);
 		adminMenu.add(memMenu);
 		memMenu.add(listMem);
+		memMenu.addSeparator();
 		memMenu.add(addMem);
 		memMenu.add(modMem);
 		memMenu.add(delMem);
 		menubar.add(adminMenu);
 		
-		
 		this.setJMenuBar(menubar);
 		
 		
-		
 		// --------------------------------------------------------
-		
+		welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		memLoginPanel.add(memLoginBtn);
 		memLoginPanel.add(memJoinBtn);
+		memLoginPanel.add(memModifyBtn);
 		memLoginPanel.add(memLogoutBtn);
-		 
-//		memPanel.add(memLoginPanel);
-		memModifyPanel = new MemModifyPanel(memberDAO);
-		memTopPanel.add(memLoginPanel, BorderLayout.NORTH);
-		memTopPanel.add(memModifyPanel, BorderLayout.CENTER);
+		
+		welcomePanel.add(welcomeLabel, BorderLayout.NORTH);
+		welcomePanel.add(memLoginPanel, BorderLayout.CENTER);
 		
 //		memPanel.add(memModifyPanel);
-		memPanel.add(memTopPanel);
+		memPanel.add(welcomePanel, BorderLayout.NORTH);
 		memBottomPanel.add(memRentalInfoTest);
 		memBottomPanel.add(memServInfoTest);
-		memPanel.add(memBottomPanel);
+		memPanel.add(memBottomPanel, BorderLayout.CENTER);
 		
 		
 		bookSearchPanel.add(bookSearchBtn);
@@ -156,7 +163,7 @@ public class MainFrame extends JFrame {
 		splitPane.add(memPanel);
 		
 		add(splitPane);
-		splitPane.setDividerLocation(700);
+		splitPane.setDividerLocation(500);
 		splitPane.setEnabled(false);
 		
 		
@@ -166,7 +173,7 @@ public class MainFrame extends JFrame {
 		check_Admin_Login();
 		generateEvents(this);
 		
-		this.setSize(1000, 700);
+		this.setSize(700, 400);
 		this.setResizable(false);
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
@@ -200,9 +207,18 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				MemLoginDialog memLoginDialog = new MemLoginDialog(frame, "로그인");
 				memLoginDialog.setMembers(memberDAO);
-				memLoginDialog.setMembersMap(membersMap);
-				memLoginDialog.setMemModifyPanel(memModifyPanel);
+//				memLoginDialog.setMembersMap(membersMap);
+//				memLoginDialog.setMemModifyPanel(memModifyPanel);
 				memLoginDialog.setVisible(true);
+			}
+		});
+		
+		this.memModifyBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MemModifyDialog memModifyDialog = new MemModifyDialog(frame, "회원정보수정", memberDAO, memberDAO.getMembers().get(sessionID));
+				memModifyDialog.setVisible(true);
 			}
 		});
 		
@@ -215,7 +231,7 @@ public class MainFrame extends JFrame {
 				member_Logout();
 				check_Member_Login();
 				membersMap = null;
-				memModifyPanel.loginShowProfile("", "", "", 0, "", "");
+//				memModifyPanel.loginShowProfile("", "", "", 0, "", "");
 			}
 		});
 		
@@ -274,8 +290,6 @@ public class MainFrame extends JFrame {
 
 	
 	
-	
-	
 	public void admin_Login() {
 		this.sessionAdmin = "T";
 	}
@@ -296,15 +310,17 @@ public class MainFrame extends JFrame {
 		if(this.sessionID != null) {
 			memLoginBtn.setEnabled(false);
 			memJoinBtn.setEnabled(false);
-			memModifyPanel.modifyBtn.setEnabled(true);
+			memModifyBtn.setEnabled(true);
 			memLogoutBtn.setEnabled(true);
 			bookSearchBtn.setEnabled(true);
+			welcomeLabel.setText(sessionID + " 님 환영합니다."); 
 		} else {
 			memLoginBtn.setEnabled(true);
 			memJoinBtn.setEnabled(true);
-			memModifyPanel.modifyBtn.setEnabled(false);
+			memModifyBtn.setEnabled(false);
 			memLogoutBtn.setEnabled(false);
 			bookSearchBtn.setEnabled(false);
+			welcomeLabel.setText("로그인 해주세요.");
 		}
 	}
 	

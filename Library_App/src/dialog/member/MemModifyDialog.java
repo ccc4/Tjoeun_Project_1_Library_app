@@ -1,4 +1,4 @@
-package panels;
+package dialog.member;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -19,8 +21,7 @@ import javax.swing.SwingConstants;
 import member.MemberDAO;
 import member.MemberDTO;
 
-public class MemModifyPanel extends JPanel{
-	
+public class MemModifyDialog extends JDialog {
 	JTextField idField;
 	JPasswordField pwField;
 	JTextField nameField;
@@ -28,9 +29,14 @@ public class MemModifyPanel extends JPanel{
 	JTextField phoneField;
 	JTextArea addressField;
 	
+	MemberDTO member;
+	
 	public JButton modifyBtn;
 	
-	public MemModifyPanel(MemberDAO memberDAO) {
+	public MemModifyDialog(JFrame frame, String title, MemberDAO memberDAO, MemberDTO member) {
+		super(frame, title, true);
+		
+		this.member = member;
 		
 		this.setLayout(new BorderLayout());
 		
@@ -91,6 +97,12 @@ public class MemModifyPanel extends JPanel{
 		this.add(centerPanel, BorderLayout.CENTER);
 		this.add(botPanel, BorderLayout.SOUTH);
 		
+		setSize(300, 450);
+		setLocationRelativeTo(null);
+		
+		loginShowProfile();
+//		if(memberDTO != null) 
+		
 		modifyBtn.addActionListener(new ActionListener() {
 			
 			@Override
@@ -112,21 +124,24 @@ public class MemModifyPanel extends JPanel{
 				memberDAO.addMem(id, member);
 				JOptionPane.showMessageDialog(null, "회원정보수정 성공!", "Alert", JOptionPane.INFORMATION_MESSAGE);
 				
-				pwField.setText(pw);
-				nameField.setText(name);
-				ageField.setText(String.valueOf(age));
-				phoneField.setText(phoneNum);
-				addressField.setText(address);
+				setVisible(false);
+//				pwField.setText(pw);
+//				nameField.setText(name);
+//				ageField.setText(String.valueOf(age));
+//				phoneField.setText(phoneNum);
+//				addressField.setText(address);
 			}
 		});
 	}
-	public void loginShowProfile(String id, String pw, String name, int age, String phoneNum, String address) {
-		idField.setText(id);
-		pwField.setText(pw);
-		nameField.setText(name);
-		if(age == 0) ageField.setText("");
-		else ageField.setText(String.valueOf(age));
-		phoneField.setText(phoneNum);
-		addressField.setText(address);
+	private void loginShowProfile() {
+		
+		idField.setText(member.getId());
+		pwField.setText(member.getPw());
+		nameField.setText(member.getName());
+//		if(member == 0) ageField.setText("");
+//		else 
+		ageField.setText(String.valueOf(member.getAge()));
+		phoneField.setText(member.getPhoneNum());
+		addressField.setText(member.getAddress());
 	}
 }
