@@ -27,12 +27,27 @@ import mainFrame.MainFrame;
 
 public class BookAddDialog extends JDialog {
 	BookDAO bookDAO;
-	
 	File targetFile;
 	String bookName;
 	
-	JPanel imagePanel;
-//	ImagePanel imagePanel;
+	JPanel botPanel;
+	JPanel centerPanel;
+	
+	JPanel writePanel;
+	ImagePanel imagePanel; // 이미지패널
+	
+	JPanel writePanel_1 = new JPanel(new BorderLayout());
+	JPanel writePanel_2 = new JPanel(new BorderLayout());
+	JPanel writePanel_3 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+	
+	JLabel titleLabel = new JLabel("  제목  ");
+	JTextField titleField = new JTextField();
+	JLabel authorLabel = new JLabel("  저자  ");
+	JTextField authorField = new JTextField();
+	JButton imgBtn = new JButton("이미지");
+	
+	JButton addBtn = new JButton("등록");
+	JButton exitBtn = new JButton("취소");
 
 	public void setBookDAO(BookDAO bookDAO) {
 		this.bookDAO = bookDAO;
@@ -41,35 +56,26 @@ public class BookAddDialog extends JDialog {
 	public BookAddDialog(MainFrame frame, String title) {
 		super(frame, title);
 		
-		JPanel centerPanel = new JPanel(new GridLayout(1, 2));
-		JPanel botPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		centerPanel = new JPanel(new GridLayout(1, 2));
+		botPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		
-//		JPanel writePanel = new JPanel(new GridLayout(3, 1));
-		JPanel writePanel = new JPanel();
+		writePanel = new JPanel();
 		writePanel.setLayout(new BoxLayout(writePanel, BoxLayout.Y_AXIS));
-		imagePanel = new JPanel();  // 이미지가 들어오면 다시 변경해야함.
+		imagePanel = new ImagePanel(".\\init\\unknown.jpg");  // 이미지가 들어오면 다시 변경해야함.
 		centerPanel.add(writePanel);
 		centerPanel.add(imagePanel);
 		
-		JPanel writePanel_1 = new JPanel(new BorderLayout());
-		JPanel writePanel_2 = new JPanel(new BorderLayout());
-		JPanel writePanel_3 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		writePanel.add(writePanel_1);
 		writePanel.add(writePanel_2);
 		writePanel.add(writePanel_3);
-		JLabel titleLabel = new JLabel("  제목  ");
-		JTextField titleField = new JTextField();
-		JLabel authorLabel = new JLabel("  저자  ");
-		JTextField authorField = new JTextField();
-		JButton imgBtn = new JButton("이미지");
+		
 		writePanel_1.add(titleLabel, BorderLayout.WEST);
 		writePanel_1.add(titleField, BorderLayout.CENTER);
 		writePanel_2.add(authorLabel, BorderLayout.WEST);
 		writePanel_2.add(authorField, BorderLayout.CENTER);
 		writePanel_3.add(imgBtn);
 		
-		JButton addBtn = new JButton("등록");
-		JButton exitBtn = new JButton("취소");
+		
 		botPanel.add(addBtn);
 		botPanel.add(exitBtn);
 		
@@ -100,13 +106,15 @@ public class BookAddDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 //				JFileChooser chooser = new JFileChooser(".\\Book Images");
-				JFileChooser chooser = new JFileChooser("C:\\Users\\402-27\\Desktop");
+				JFileChooser chooser = new JFileChooser(".");
 				int ret = chooser.showOpenDialog(null);
 				if(ret != JFileChooser.APPROVE_OPTION) return;
 				
 				String targetFilePath = chooser.getSelectedFile().getPath();
 				targetFile = new File(targetFilePath);
 //				byte[] targetContents = new byte[(int) targetFile.length()];
+				imagePanel.setImage(targetFilePath);
+				
 				
 			}
 		});
@@ -138,23 +146,25 @@ public class BookAddDialog extends JDialog {
 
 
 	
-//	class ImagePanel extends JPanel {
-//		ImageIcon imageicon;
-//		Image image;
-//		
-//		public ImagePanel() {
-//			
-//		}
-//		
-//		public ImagePanel(String location) {
-//			imageicon = new ImageIcon(location);
-//			image = imageicon.getImage();
-//		}
-//		
-//		@Override
-//		public void paintComponents(Graphics g) {
-//			super.paintComponents(g);
-//			g.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), this);
-//		}
-//	}
+	class ImagePanel extends JPanel {
+		ImageIcon imageicon;
+		Image image;
+		
+		public ImagePanel(String location) {
+			imageicon = new ImageIcon(location);
+			image = imageicon.getImage();
+		}
+		
+		public void setImage(String location) {
+			imageicon = new ImageIcon(location);
+			image = imageicon.getImage();
+			repaint();
+		}
+		
+		@Override
+		protected void paintComponent(Graphics g) {
+			super.paintComponents(g);
+			g.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), this);
+		}
+	}
 }
