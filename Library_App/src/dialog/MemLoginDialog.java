@@ -8,7 +8,6 @@ import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -17,8 +16,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import mainFrame.MainFrame;
-import mainFrame.MainFrame.MemModifyPanel;
 import member.MemberDTO;
+import panels.MemModifyPanel;
 import member.MemberDAO;
 
 public class MemLoginDialog extends JDialog {
@@ -93,8 +92,8 @@ public class MemLoginDialog extends JDialog {
 					MemberDTO member = membersMap.get(id);
 					if(member.getPw().equals(pw)) {
 						JOptionPane.showMessageDialog(null, "로그인 성공!", "Login Success", JOptionPane.INFORMATION_MESSAGE);
-						frame.login_Success(id);
-						frame.checkMemberLogin();
+						frame.member_Login_Success(id);
+						frame.check_Member_Login();
 						memModifyPanel.loginShowProfile(member.getId(), member.getPw(), member.getName(), member.getAge(), member.getPhoneNum(), member.getAddress());
 						setVisible(false);
 						

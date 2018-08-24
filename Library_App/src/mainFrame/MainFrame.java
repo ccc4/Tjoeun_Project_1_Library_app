@@ -15,12 +15,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
 import book.BookDAO;
 import book.BookDTO;
@@ -31,6 +28,8 @@ import dialog.MemJoinDialog;
 import dialog.MemLoginDialog;
 import member.MemberDTO;
 import member.MemberList;
+import panels.BookListPanel;
+import panels.MemModifyPanel;
 import member.MemberDAO;
 
 public class MainFrame extends JFrame {
@@ -42,22 +41,23 @@ public class MainFrame extends JFrame {
 	JPanel memLoginPanel = new JPanel(new GridLayout(1, 3));
 	
 	MemModifyPanel memModifyPanel;
-	JPanel memProfilePanel = new JPanel();
+	JPanel memTopPanel = new JPanel(new BorderLayout());
 	
 	JButton memRentalInfoTest = new JButton("대여정보");
 //	JPanel memRentalInfoPanel = new JPanel();
 	JButton memServInfoTest = new JButton("예약정보");
 //	JPanel memServInfoPanel = new JPanel();
-	JPanel memPanel = new JPanel(new GridLayout(3, 1));
+	JPanel memBottomPanel = new JPanel(new GridLayout(2, 1));
+	JPanel memPanel = new JPanel(new GridLayout(2, 1));
 	
 	
 	// 책 관련
 	JButton bookSearchBtn = new JButton("책 검색");
 	JPanel bookSearchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 	
-	JButton bookListTest = new JButton("책리스트");
-//	JPanel bookListPanel = new JPanel();
-	JButton bookInfoTest = new JButton("도서정보");
+//	JButton bookListTest = new JButton("책리스트");
+	BookListPanel bookListPanel;
+//	JButton bookInfoTest = new JButton("도서정보");
 //	JPanel bookInfoPanel = new JPanel();
 	JPanel bookListInfoPanel = new JPanel(new GridLayout(2, 1));
 	
@@ -66,7 +66,7 @@ public class MainFrame extends JFrame {
 	JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 	
 	// -------------------------------------------------------------------
-	
+	// 관리자 메뉴바
 	JMenuBar menubar = new  JMenuBar();
 	JMenu optionMenu = new JMenu("Option");
 	JMenuItem adminLogin = new JMenuItem("관리자 로그인");
@@ -85,15 +85,13 @@ public class MainFrame extends JFrame {
 	
 	
 	// -------------------------------------------------------------------
-	
+	// 메인 필드
 	String sessionID;
+	String sessionAdmin;
 	MemberDAO memberDAO;
 	HashMap<String, MemberDTO> membersMap;
 	BookDAO bookDAO;
 	HashMap<String, BookDTO> booksMap;
-	
-	boolean checkMemberLogin = false;
-	boolean checkAdminLogin = false;
 	
 	// -------------------------------------------------------------------
 	
@@ -101,41 +99,10 @@ public class MainFrame extends JFrame {
 		super("도서관 애플리케이션");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		memLoginPanel.add(memLoginBtn);
-		memLoginPanel.add(memJoinBtn);
-		memLoginPanel.add(memLogoutBtn);
+		memberDAO = new MemberDAO();
+		bookDAO = new BookDAO();
 		
-//		memPanel.add(memLoginPanel);
-		memModifyPanel = new MemModifyPanel();
-		memProfilePanel.setLayout(new BorderLayout());
-		memProfilePanel.add(memLoginPanel, BorderLayout.NORTH);
-		memProfilePanel.add(memModifyPanel, BorderLayout.CENTER);
-		
-//		memPanel.add(memModifyPanel);
-		memPanel.add(memProfilePanel);
-		memPanel.add(memRentalInfoTest);
-		memPanel.add(memServInfoTest);
-		
-		
-		bookSearchPanel.add(bookSearchBtn);
-		
-		bookListInfoPanel.add(bookListTest);
-		bookListInfoPanel.add(bookInfoTest);
-		
-		bookPanel.add(bookSearchPanel, BorderLayout.NORTH);
-		bookPanel.add(bookListInfoPanel, BorderLayout.CENTER);
-		
-		
-		splitPane.add(bookPanel);
-		splitPane.add(memPanel);
-		
-		add(splitPane);
-		splitPane.setDividerLocation(600);
-		splitPane.setEnabled(false);
-		
-		
-		// --------------------------------------------------------
-		
+
 		optionMenu.add(adminLogin);
 		menubar.add(optionMenu);
 		adminMenu.add(adminLogout);
@@ -158,17 +125,51 @@ public class MainFrame extends JFrame {
 		
 		// --------------------------------------------------------
 		
-		checkMemberLogin();
-		checkAdminLogin(checkAdminLogin);
+		
+		memLoginPanel.add(memLoginBtn);
+		memLoginPanel.add(memJoinBtn);
+		memLoginPanel.add(memLogoutBtn);
+		 
+//		memPanel.add(memLoginPanel);
+		memModifyPanel = new MemModifyPanel(memberDAO);
+		memTopPanel.add(memLoginPanel, BorderLayout.NORTH);
+		memTopPanel.add(memModifyPanel, BorderLayout.CENTER);
+		
+//		memPanel.add(memModifyPanel);
+		memPanel.add(memTopPanel);
+		memBottomPanel.add(memRentalInfoTest);
+		memBottomPanel.add(memServInfoTest);
+		memPanel.add(memBottomPanel);
+		
+		
+		bookSearchPanel.add(bookSearchBtn);
+		
+		bookListPanel = new BookListPanel();
+//		bookListInfoPanel.add(bookListPanel);
+//		bookListInfoPanel.add(bookInfoTest);
+		
+		bookPanel.add(bookSearchPanel, BorderLayout.NORTH);
+		bookPanel.add(bookListPanel, BorderLayout.CENTER);
+		
+		
+		splitPane.add(bookPanel);
+		splitPane.add(memPanel);
+		
+		add(splitPane);
+		splitPane.setDividerLocation(700);
+		splitPane.setEnabled(false);
+		
+		
+		// --------------------------------------------------------
+		
+		check_Member_Login();
+		check_Admin_Login();
 		generateEvents(this);
 		
-		this.setSize(1000, 900);
+		this.setSize(1000, 700);
 		this.setResizable(false);
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
-		
-		memberDAO = new MemberDAO();
-		bookDAO = new BookDAO();
 	}
 	
 	
@@ -211,8 +212,8 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				int check = JOptionPane.showConfirmDialog(null, "로그아웃 하시겠습니까?", "Logout Confirm", JOptionPane.YES_NO_OPTION);
 				if(!(check == JOptionPane.YES_OPTION)) return;
-				logout();
-				checkMemberLogin();
+				member_Logout();
+				check_Member_Login();
 				membersMap = null;
 				memModifyPanel.loginShowProfile("", "", "", 0, "", "");
 			}
@@ -235,7 +236,8 @@ public class MainFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				checkAdminLogin(false);
+				admin_Logout();
+				check_Admin_Login();
 			}
 		});
 		
@@ -269,130 +271,28 @@ public class MainFrame extends JFrame {
 		});
 	}
 	
-	
-	
-	public class MemModifyPanel extends JPanel {
-		JTextField idField;
-		JPasswordField pwField;
-		JTextField nameField;
-		JTextField ageField;
-		JTextField phoneField;
-		JTextArea addressField;
-		
-		JButton modifyBtn;
-		
-		public MemModifyPanel() {
-			this.setLayout(new BorderLayout());
-			
-			JPanel centerPanel = new JPanel(new GridLayout(2, 1));
-			JPanel botPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-			
-			modifyBtn = new JButton("Modify");
-			botPanel.add(modifyBtn);
-			
-			JPanel A_Panel = new JPanel(new BorderLayout());
-			JPanel B_Panel = new JPanel(new BorderLayout());
-			centerPanel.add(A_Panel);
-			centerPanel.add(B_Panel);
-			
-			JPanel A_LabelPanel = new JPanel(new GridLayout(5, 1));
-			JLabel idLabel = new JLabel("ID");
-			JLabel pwLabel = new JLabel("PW");
-			JLabel nameLabel = new JLabel("Name");
-			JLabel ageLabel = new JLabel("age");
-			JLabel phoneNumLabel = new JLabel("Phone");
-			A_LabelPanel.add(idLabel);
-			A_LabelPanel.add(pwLabel);
-			A_LabelPanel.add(nameLabel);
-			A_LabelPanel.add(ageLabel);
-			A_LabelPanel.add(phoneNumLabel);
-			
-			JPanel A_FieldPanel = new JPanel(new GridLayout(5, 1));
-			idField = new JTextField();
-			pwField = new JPasswordField();
-			nameField = new JTextField();
-			ageField = new JTextField();
-			phoneField = new JTextField();
-			A_FieldPanel.add(idField);
-			A_FieldPanel.add(pwField);
-			A_FieldPanel.add(nameField);
-			A_FieldPanel.add(ageField);
-			A_FieldPanel.add(phoneField);
-			
-			A_Panel.add(A_LabelPanel, BorderLayout.WEST);
-			A_Panel.add(A_FieldPanel, BorderLayout.CENTER);
-			
-			JLabel addressLabel = new JLabel("Address");
-			addressField = new JTextArea();
-			JScrollPane addressPanel = new JScrollPane(addressField);
-			
-			B_Panel.add(addressLabel, BorderLayout.WEST);
-			B_Panel.add(addressPanel, BorderLayout.CENTER);
-			
-			idLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			pwLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			ageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			phoneNumLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			addressLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			idField.setEditable(false);
 
-			
-			this.add(centerPanel, BorderLayout.CENTER);
-			this.add(botPanel, BorderLayout.SOUTH);
-			
-			modifyBtn.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					int check = JOptionPane.showConfirmDialog(null, "회원정보를 수정하시겠습니까?", "Modify Confirm", JOptionPane.YES_NO_OPTION);
-					if(!(check == JOptionPane.YES_OPTION)) return;
-//					MemberDTO member = membersMap.get(idField.getText());
-					
-					String id = idField.getText();
-					String pw = pwField.getText();
-					String name = nameField.getText();
-					int age = Integer.parseInt(ageField.getText());
-					String phoneNum = phoneField.getText();
-					String address = addressField.getText();
-					
-//					System.out.printf("%s, %s, %s, %d, %s, %s", id, pw, name, age, phoneNum, address);
-					
-					MemberDTO member = new MemberDTO(id, pw, name, age, phoneNum, address);
-					memberDAO.addMem(id, member);
-					JOptionPane.showMessageDialog(null, "회원정보수정 성공!", "Alert", JOptionPane.INFORMATION_MESSAGE);
-					
-					pwField.setText(pw);
-					nameField.setText(name);
-					ageField.setText(String.valueOf(age));
-					phoneField.setText(phoneNum);
-					addressField.setText(address);
-				}
-			});
-		}
-		public void loginShowProfile(String id, String pw, String name, int age, String phoneNum, String address) {
-			idField.setText(id);
-			pwField.setText(pw);
-			nameField.setText(name);
-			if(age == 0) ageField.setText("");
-			else ageField.setText(String.valueOf(age));
-			phoneField.setText(phoneNum);
-			addressField.setText(address);
-		}
+	
+	
+	
+	
+	public void admin_Login() {
+		this.sessionAdmin = "T";
 	}
-	
-	
-	
-	
-	public void login_Success(String id) {
+
+	public void admin_Logout() {
+		this.sessionAdmin = null;
+	}
+
+	public void member_Login_Success(String id) {
 		this.sessionID = id;
 	}
 	
-	public void logout() {
+	public void member_Logout() {
 		this.sessionID = null;
 	}
 	
-	public void checkMemberLogin() {
+	public void check_Member_Login() {
 		if(this.sessionID != null) {
 			memLoginBtn.setEnabled(false);
 			memJoinBtn.setEnabled(false);
@@ -408,8 +308,8 @@ public class MainFrame extends JFrame {
 		}
 	}
 	
-	public void checkAdminLogin(boolean checkLogin) {
-		if(checkLogin) {
+	public void check_Admin_Login() {
+		if(this.sessionAdmin != null) {
 			adminMenu.setVisible(true);
 			adminLogin.setEnabled(false);
 		} else {

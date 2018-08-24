@@ -72,7 +72,8 @@ public class AdminLoginDialog extends JDialog {
 				String pw = pwField.getText();
 				
 				if(id.equals(ADMIN_ID) && pw.equals(ADMIN_PW)) {
-					frame.checkAdminLogin(true);
+					frame.admin_Login();
+					frame.check_Admin_Login();
 					setVisible(false);
 				} else {
 					JOptionPane.showMessageDialog(null, "로그인 실패!", "Login Fail", JOptionPane.WARNING_MESSAGE);
