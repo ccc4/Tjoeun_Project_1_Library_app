@@ -19,15 +19,15 @@ import javax.swing.SwingConstants;
 import mainFrame.MainFrame;
 import mainFrame.MainFrame.MemModifyPanel;
 import member.MemberDTO;
-import member.Members;
+import member.MemberDAO;
 
 public class MemLoginDialog extends JDialog {
-	Members members;
+	MemberDAO memberDAO;
 	HashMap<String, MemberDTO> membersMap;
 	MemModifyPanel memModifyPanel;
 
-	public void setMembers(Members members) {
-		this.members = members;
+	public void setMembers(MemberDAO memberDAO) {
+		this.memberDAO = memberDAO;
 	}
 	
 	public void setMembersMap(HashMap<String, MemberDTO> membersMap) {
@@ -88,12 +88,13 @@ public class MemLoginDialog extends JDialog {
 				String id = idField.getText();
 				String pw = pwField.getText();
 				
-				if(members.checkMem(id)) {
-					membersMap = members.getMembers();
+				if(memberDAO.checkExist(id)) {
+					membersMap = memberDAO.getMembers();
 					MemberDTO member = membersMap.get(id);
 					if(member.getPw().equals(pw)) {
 						JOptionPane.showMessageDialog(null, "로그인 성공!", "Login Success", JOptionPane.INFORMATION_MESSAGE);
-						frame.checkMemberLogin(true);
+						frame.login_Success(id);
+						frame.checkMemberLogin();
 						memModifyPanel.loginShowProfile(member.getId(), member.getPw(), member.getName(), member.getAge(), member.getPhoneNum(), member.getAddress());
 						setVisible(false);
 						

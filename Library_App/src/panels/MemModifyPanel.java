@@ -1,4 +1,4 @@
-package dialog;
+package panels;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -7,8 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -18,27 +16,29 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import mainFrame.MainFrame;
-import member.MemberDTO;
 import member.MemberDAO;
+import member.MemberDTO;
 
-public class MemJoinDialog extends JDialog {
-	MemberDAO memberDAO;
+public class MemModifyPanel extends JPanel{
 	
-	public void setMembers(MemberDAO memberDAO) {
-		this.memberDAO = memberDAO;
-	}
-
-	public MemJoinDialog(MainFrame frame, String title) {
-		super(frame, title, true);
+	JTextField idField;
+	JPasswordField pwField;
+	JTextField nameField;
+	JTextField ageField;
+	JTextField phoneField;
+	JTextArea addressField;
+	
+	public JButton modifyBtn;
+	
+	public MemModifyPanel(MemberDAO memberDAO) {
+		
+		this.setLayout(new BorderLayout());
 		
 		JPanel centerPanel = new JPanel(new GridLayout(2, 1));
-		JPanel botPanel = new JPanel(new FlowLayout());
+		JPanel botPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		
-		JButton joinBtn = new JButton("Join");
-		JButton exitBtn = new JButton("Exit");
-		botPanel.add(joinBtn);
-		botPanel.add(exitBtn);
+		modifyBtn = new JButton("Modify");
+		botPanel.add(modifyBtn);
 		
 		JPanel A_Panel = new JPanel(new BorderLayout());
 		JPanel B_Panel = new JPanel(new BorderLayout());
@@ -58,11 +58,11 @@ public class MemJoinDialog extends JDialog {
 		A_LabelPanel.add(phoneNumLabel);
 		
 		JPanel A_FieldPanel = new JPanel(new GridLayout(5, 1));
-		JTextField idField = new JTextField();
-		JPasswordField pwField = new JPasswordField();
-		JTextField nameField = new JTextField();
-		JTextField ageField = new JTextField();
-		JTextField phoneField = new JTextField();
+		idField = new JTextField();
+		pwField = new JPasswordField();
+		nameField = new JTextField();
+		ageField = new JTextField();
+		phoneField = new JTextField();
 		A_FieldPanel.add(idField);
 		A_FieldPanel.add(pwField);
 		A_FieldPanel.add(nameField);
@@ -73,7 +73,7 @@ public class MemJoinDialog extends JDialog {
 		A_Panel.add(A_FieldPanel, BorderLayout.CENTER);
 		
 		JLabel addressLabel = new JLabel("Address");
-		JTextArea addressField = new JTextArea();
+		addressField = new JTextArea();
 		JScrollPane addressPanel = new JScrollPane(addressField);
 		
 		B_Panel.add(addressLabel, BorderLayout.WEST);
@@ -85,34 +85,19 @@ public class MemJoinDialog extends JDialog {
 		ageLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		phoneNumLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		addressLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		idField.setEditable(false);
 
 		
-//		getContentPane().setLayout(new BorderLayout());
 		this.add(centerPanel, BorderLayout.CENTER);
 		this.add(botPanel, BorderLayout.SOUTH);
 		
-		setSize(300, 450);
-		setLocationRelativeTo(null);
-		
-		
-		
-		exitBtn.addActionListener(new ActionListener() {
+		modifyBtn.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-//				nameField.setText("");
-//				ageField.setText("");
-//				phoneField.setText("");
-//				addressField.setText("");
-			}
-		});
-		
-		joinBtn.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// 회원가입 구현
+				int check = JOptionPane.showConfirmDialog(null, "회원정보를 수정하시겠습니까?", "Modify Confirm", JOptionPane.YES_NO_OPTION);
+				if(!(check == JOptionPane.YES_OPTION)) return;
+//				MemberDTO member = membersMap.get(idField.getText());
 				
 				String id = idField.getText();
 				String pw = pwField.getText();
@@ -123,23 +108,25 @@ public class MemJoinDialog extends JDialog {
 				
 //				System.out.printf("%s, %s, %s, %d, %s, %s", id, pw, name, age, phoneNum, address);
 				
-				MemberDTO newMember = new MemberDTO(id, pw, name, age, phoneNum, address);
-				if(memberDAO.checkExist(id)) {
-					JOptionPane.showMessageDialog(null, "이미 가입된 아이디가 있습니다.", "Alert", JOptionPane.WARNING_MESSAGE);
-				} else {
-					memberDAO.addMem(id, newMember);
-					JOptionPane.showMessageDialog(null, "회원가입 성공!", "Alert", JOptionPane.INFORMATION_MESSAGE);
-				}
+				MemberDTO member = new MemberDTO(id, pw, name, age, phoneNum, address);
+				memberDAO.addMem(id, member);
+				JOptionPane.showMessageDialog(null, "회원정보수정 성공!", "Alert", JOptionPane.INFORMATION_MESSAGE);
 				
-				
-				setVisible(false);
-//				idField.setText("");
-//				pwField.setText("");
-//				nameField.setText("");
-//				ageField.setText("");
-//				phoneField.setText("");
-//				addressField.setText("");
+				pwField.setText(pw);
+				nameField.setText(name);
+				ageField.setText(String.valueOf(age));
+				phoneField.setText(phoneNum);
+				addressField.setText(address);
 			}
 		});
+	}
+	public void loginShowProfile(String id, String pw, String name, int age, String phoneNum, String address) {
+		idField.setText(id);
+		pwField.setText(pw);
+		nameField.setText(name);
+		if(age == 0) ageField.setText("");
+		else ageField.setText(String.valueOf(age));
+		phoneField.setText(phoneNum);
+		addressField.setText(address);
 	}
 }

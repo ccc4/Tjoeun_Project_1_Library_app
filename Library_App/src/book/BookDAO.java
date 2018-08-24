@@ -1,4 +1,4 @@
-package member;
+package book;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -10,26 +10,25 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Members {
+public class BookDAO {
 	private final String DIRNAME = ".\\init";
-	private final String FILENAME = "members.txt";
+	private final String FILENAME = "Books.txt";
 	
-//	ArrayList<MemberDTO> members;
-	HashMap<String, MemberDTO> members;
+	int idx;
+	
+	HashMap<String, BookDTO> books;
 	File file;
 	
-	public HashMap<String, MemberDTO> getMembers() {
-		return members;
+	public HashMap<String, BookDTO> getBooks() {
+		return books;
 	}
-
-	public void setMembers(HashMap<String, MemberDTO> members) {
-		this.members = members;
+	public void setBooks(HashMap<String, BookDTO> books) {
+		this.books = books;
 	}
-
-	public Members() {
+	
+	public BookDAO() {
 		try {
 			File dir = new File(DIRNAME);
 			if(!dir.exists()) dir.mkdirs();
@@ -38,40 +37,46 @@ public class Members {
 			
 			BufferedReader check = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 			if(check.readLine() == null) {
-				members = new HashMap<>();
+				books = new HashMap<>();
 				System.out.println("파일없어서 새로 만듦");
-				saveMembersToFile(members);
+				saveBooksToFile(books);
+//				idx = 0;
 			} else {
-//				BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
 				ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
-				members = (HashMap<String, MemberDTO>) in.readObject();
+				books = (HashMap<String, BookDTO>) in.readObject();
 				in.close();
 			}
 			
-		} catch (IOException | ClassNotFoundException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void addMem(String id, MemberDTO member) {
-		this.members.put(id, member);
-		saveMembersToFile(this.members);
+	public boolean checkExist(String bookName) {
+		return this.books.containsKey(bookName);
 	}
 	
-	public boolean checkMem(String id) {
-		return this.members.containsKey(id);
+	public void addBook(String bookName, BookDTO newBook) {
+//		newBook.setIdx(++idx);
+		this.books.put(bookName, newBook);
+		saveBooksToFile(this.books);
 	}
 	
-	public void saveMembersToFile(HashMap<String, MemberDTO> members) {
+	public void saveBooksToFile(HashMap<String, BookDTO> books) {
 		try {
 //			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
-			out.writeObject(members);
-			out.flush();
-			System.out.println("Members Save Success!");
-			out.close();
+			ObjectOutputStream bookOut = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+			bookOut.writeObject(books);
+			bookOut.flush();
+			
+			// 이미지 저장 구현할 곳
+			
+			System.out.println("Books Save Success!");
+			bookOut.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
+	
 }

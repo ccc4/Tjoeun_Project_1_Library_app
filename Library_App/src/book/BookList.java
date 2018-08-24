@@ -1,4 +1,4 @@
-package member;
+package book;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -9,24 +9,24 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-public class MemberList {
+public class BookList {
 	
-	public MemberList() {
+	public BookList() {
 		File dir = new File(".\\init");
-		File file = new File(dir, "Members.txt");
+		File file = new File(dir, "Books.txt");
 		try {
 			ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
-			HashMap<String, MemberDTO> members = (HashMap<String, MemberDTO>) in.readObject();
+			HashMap<String, BookDTO> books = (HashMap<String, BookDTO>) in.readObject();
 			
-			System.out.printf("등록된 회원 수: %d 명\n", members.size());
+			System.out.printf("등록된 책 권 수: %d 권\n", books.size());
 			
-			Set<String> keySet = members.keySet();
+			Set<String> keySet = books.keySet();
 			Iterator<String> keyIterator = keySet.iterator();
 			while(keyIterator.hasNext()) {
 				String key = keyIterator.next();
-				MemberDTO member = members.get(key);
-				System.out.printf("id: %s // pw: %s // name: %s // age: %s // phone: %s // address: %s // count: %s\n", 
-						key, member.getPw(), member.getName(), member.getAge(), member.getPhoneNum(), member.getAddress(), member.getCountRentalBook());
+				BookDTO book = books.get(key);
+				System.out.printf("책 제목: %s // 저자: %s // 상태: %s // 빌려간사람: %s\n", 
+						key, book.getBookAuthor(), book.getBookState(), book.getRentaledByWho());
 			}
 			
 			
@@ -38,6 +38,6 @@ public class MemberList {
 	
 	
 	public static void main(String[] args) {
-		new MemberList();
+		new BookList();
 	}
 }
