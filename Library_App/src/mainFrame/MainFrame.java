@@ -31,6 +31,8 @@ import dialog.member.MemModifyDialog;
 import member.MemberDTO;
 import member.MemberList;
 import panels.BookListPanel;
+import panels.MemRentalPanel;
+import panels.MemReservePanel;
 import member.MemberDAO;
 
 public class MainFrame extends JFrame {
@@ -44,25 +46,14 @@ public class MainFrame extends JFrame {
 	JPanel memLoginPanel = new JPanel(new GridLayout(2, 2));
 	JPanel welcomePanel = new JPanel(new BorderLayout());
 	
-//	MemModifyPanel memModifyPanel;
 	JPanel memTopPanel = new JPanel(new BorderLayout());
 	
-	JButton memRentalInfoTest = new JButton("대여정보");
-//	JPanel memRentalInfoPanel = new JPanel();
-	JButton memServInfoTest = new JButton("예약정보");
-//	JPanel memServInfoPanel = new JPanel();
+	public MemRentalPanel memRentalPanel; 	// 대여정보
+	public MemReservePanel memReservePanel; // 예약정보
 	JPanel memBottomPanel = new JPanel(new GridLayout(2, 1));
 	JPanel memPanel = new JPanel(new BorderLayout());
 	
-	
-	// 책 관련
-	JButton bookSearchBtn = new JButton("책 검색");
-	JPanel bookSearchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-	
-//	JButton bookListTest = new JButton("책리스트");
-	BookListPanel bookListPanel;
-//	JButton bookInfoTest = new JButton("도서정보");
-//	JPanel bookInfoPanel = new JPanel();
+	public BookListPanel bookListPanel;
 	JPanel bookListInfoPanel = new JPanel(new GridLayout(2, 1));
 	
 	JPanel bookPanel = new JPanel(new BorderLayout());
@@ -71,33 +62,22 @@ public class MainFrame extends JFrame {
 	
 	// -------------------------------------------------------------------
 	// 관리자 메뉴바
-	JMenuBar menubar = new  JMenuBar();
-	JMenu optionMenu = new JMenu("Option");
-	JMenuItem adminLogin = new JMenuItem("관리자 로그인");
-	JMenu adminMenu = new JMenu("Admin Menu");
-	JMenuItem adminLogout = new JMenuItem("관리자 로그아웃");
-	JMenu bookMenu = new JMenu("책 관리");
-	JMenuItem listBook = new JMenuItem("책 목록");
-	JMenuItem addBook = new JMenuItem("책 등록");
-	JMenuItem modBook = new JMenuItem("책 수정");
-	JMenuItem delBook = new JMenuItem("책 삭제");
-	JMenu memMenu = new JMenu("회원 관리");
-	JMenuItem listMem = new JMenuItem("회원 목록");
-	JMenuItem addMem = new JMenuItem("회원 등록");
-	JMenuItem modMem = new JMenuItem("회원 수정");
-	JMenuItem delMem = new JMenuItem("회원 삭제");
-	
+	public MainMenuBar menubar = new MainMenuBar(this);
 	
 	// -------------------------------------------------------------------
 	// 메인 필드
 	String sessionID;
+	public String getSessionID() {
+		return sessionID;
+	}
+
 	String sessionAdmin;
 	
 	MemberDAO memberDAO;
 	HashMap<String, MemberDTO> membersMap;
 	
 	BookDAO bookDAO;
-//	HashMap<String, BookDTO> booksMap; // 안쓰인다
+//	HashMap<String, BookDTO> booksMap; // 안쓰면 삭제
 	
 	// -------------------------------------------------------------------
 	
@@ -107,26 +87,6 @@ public class MainFrame extends JFrame {
 		
 		memberDAO = new MemberDAO();
 		bookDAO = new BookDAO();
-		
-		// --------------------------------------------------------
-		// 메뉴바 구현
-		
-		optionMenu.add(adminLogin);
-		menubar.add(optionMenu);
-		adminMenu.add(adminLogout);
-		adminMenu.add(bookMenu);
-		bookMenu.add(listBook);
-		bookMenu.addSeparator();
-		bookMenu.add(addBook);
-		bookMenu.add(modBook);
-		bookMenu.add(delBook);
-		adminMenu.add(memMenu);
-		memMenu.add(listMem);
-		memMenu.addSeparator();
-		memMenu.add(addMem);
-		memMenu.add(modMem);
-		memMenu.add(delMem);
-		menubar.add(adminMenu);
 		
 		this.setJMenuBar(menubar);
 		
@@ -142,24 +102,18 @@ public class MainFrame extends JFrame {
 		welcomePanel.add(welcomeLabel, BorderLayout.NORTH);
 		welcomePanel.add(memLoginPanel, BorderLayout.CENTER);
 		
-//		memPanel.add(memModifyPanel);
 		memPanel.add(welcomePanel, BorderLayout.NORTH);
-		memBottomPanel.add(memRentalInfoTest);
-		memBottomPanel.add(memServInfoTest);
+		memRentalPanel = new MemRentalPanel(this, bookDAO, memberDAO);
+		memReservePanel = new MemReservePanel(this, bookDAO, memberDAO);
+		
+		memBottomPanel.add(memRentalPanel);
+		memBottomPanel.add(memReservePanel);
 		memPanel.add(memBottomPanel, BorderLayout.CENTER);
 		
-		
-		bookSearchPanel.add(bookSearchBtn);
-		
-		bookListPanel = new BookListPanel();
-//		bookListInfoPanel.add(bookListPanel);
-//		bookListInfoPanel.add(bookInfoTest);
-		
-		bookPanel.add(bookSearchPanel, BorderLayout.NORTH);
-		bookPanel.add(bookListPanel, BorderLayout.CENTER);
+		bookListPanel = new BookListPanel(this, bookDAO, memberDAO);
 		
 		
-		splitPane.add(bookPanel);
+		splitPane.add(bookListPanel);
 		splitPane.add(memPanel);
 		
 		add(splitPane);
@@ -196,8 +150,6 @@ public class MainFrame extends JFrame {
 				MemJoinDialog memJoinDialog = new MemJoinDialog(frame, "회원가입");
 				memJoinDialog.setMembers(memberDAO);
 				memJoinDialog.setVisible(true);
-				//모달로 설정
-				
 			}
 		});
 		
@@ -207,8 +159,6 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				MemLoginDialog memLoginDialog = new MemLoginDialog(frame, "로그인");
 				memLoginDialog.setMembers(memberDAO);
-//				memLoginDialog.setMembersMap(membersMap);
-//				memLoginDialog.setMemModifyPanel(memModifyPanel);
 				memLoginDialog.setVisible(true);
 			}
 		});
@@ -229,81 +179,24 @@ public class MainFrame extends JFrame {
 				int check = JOptionPane.showConfirmDialog(null, "로그아웃 하시겠습니까?", "Logout Confirm", JOptionPane.YES_NO_OPTION);
 				if(!(check == JOptionPane.YES_OPTION)) return;
 				member_Logout();
-				check_Member_Login();
-				membersMap = null;
-//				memModifyPanel.loginShowProfile("", "", "", 0, "", "");
 			}
 		});
 		
-		// --------------------------------------------------------------
-		// 관리자 리스너
-		
-		this.adminLogin.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				AdminLoginDialog adminLoginDialog = new AdminLoginDialog(frame, "관리자 로그인");
-				adminLoginDialog.setVisible(true);
-				
-			}
-		});
-		
-		this.adminLogout.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				admin_Logout();
-				check_Admin_Login();
-			}
-		});
-		
-		this.listMem.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				new MemberList();
-			}
-		});
-		
-		// --------------------------------------------------------------
-		// 책 관리 리스너
-		
-		this.addBook.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				BookAddDialog bookAddDialog = new BookAddDialog(frame, "책 등록");
-				bookAddDialog.setBookDAO(bookDAO);
-				bookAddDialog.setVisible(true);
-			}
-		});
-		
-		this.listBook.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				new BookList();
-			}
-		});
 	}
 	
 
 	
 	
-	public void admin_Login() {
-		this.sessionAdmin = "T";
-	}
-
-	public void admin_Logout() {
-		this.sessionAdmin = null;
-	}
+	
 
 	public void member_Login_Success(String id) {
 		this.sessionID = id;
+		check_Member_Login();
 	}
 	
 	public void member_Logout() {
 		this.sessionID = null;
+		check_Member_Login();
 	}
 	
 	public void check_Member_Login() {
@@ -312,26 +205,46 @@ public class MainFrame extends JFrame {
 			memJoinBtn.setEnabled(false);
 			memModifyBtn.setEnabled(true);
 			memLogoutBtn.setEnabled(true);
-			bookSearchBtn.setEnabled(true);
 			welcomeLabel.setText(sessionID + " 님 환영합니다."); 
+			
+			bookListPanel.bookSearchBtn.setEnabled(true);
+			bookListPanel.rentalBtn.setEnabled(true);
+			bookListPanel.reserveBtn.setEnabled(true);
 		} else {
 			memLoginBtn.setEnabled(true);
 			memJoinBtn.setEnabled(true);
 			memModifyBtn.setEnabled(false);
 			memLogoutBtn.setEnabled(false);
-			bookSearchBtn.setEnabled(false);
+			membersMap = null;
 			welcomeLabel.setText("로그인 해주세요.");
+			
+			bookListPanel.bookSearchBtn.setEnabled(false);
+			bookListPanel.rentalBtn.setEnabled(false);
+			bookListPanel.reserveBtn.setEnabled(false);
+			
+			memRentalPanel.memLogout();
+			memReservePanel.memLogout();
 		}
+	}
+	
+	public void admin_Login() {
+		this.sessionAdmin = "T";
+		check_Admin_Login();
+	}
+
+	public void admin_Logout() {
+		this.sessionAdmin = null;
+		check_Admin_Login();
 	}
 	
 	public void check_Admin_Login() {
 		if(this.sessionAdmin != null) {
-			adminMenu.setVisible(true);
-			adminLogin.setEnabled(false);
+			menubar.adminMenu.setVisible(true);
+			menubar.adminLogin.setEnabled(false);
 		} else {
-//			adminMenu.setVisible(false);
-			adminMenu.setVisible(true);
-			adminLogin.setEnabled(true);
+			menubar.adminMenu.setVisible(false); // 테스트할동안 꺼놓기
+//			adminMenu.setVisible(true);
+			menubar.adminLogin.setEnabled(true);
 		}
 	}
 	

@@ -5,6 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,13 +14,15 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
 public class BookDAO {
-	private final String DIRNAME = ".\\init";
-	private final String FILENAME = "Books.txt";
+	private final String BOOKS_FILE_DIR = ".\\init";
+	private final String BOOKS_FILE = "Books.txt";
 	
-	int idx;
+	private final String BOOK_IMAGES_DIR = ".\\init\\Book_Images";
 	
-	HashMap<String, BookDTO> books;
+//	int idx;
+	
 	File file;
+	HashMap<String, BookDTO> books;
 	
 	public HashMap<String, BookDTO> getBooks() {
 		return books;
@@ -30,9 +33,9 @@ public class BookDAO {
 	
 	public BookDAO() {
 		try {
-			File dir = new File(DIRNAME);
+			File dir = new File(BOOKS_FILE_DIR);
 			if(!dir.exists()) dir.mkdirs();
-			this.file = new File(dir, FILENAME);
+			this.file = new File(dir, BOOKS_FILE);
 			if(!file.exists()) file.createNewFile();
 			
 			BufferedReader check = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
@@ -76,6 +79,30 @@ public class BookDAO {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void addBookImg(String bookImgName, String targetImgFilePath) {
+
+		File targetImgFile = new File(targetImgFilePath);
+		if(!targetImgFile.exists()) return;
+		byte[] targetImgFileContents = new byte[(int) targetImgFile.length()];
+		
+		File saveImgFileDir = new File(BOOK_IMAGES_DIR);
+		if(!saveImgFileDir.exists()) saveImgFileDir.mkdirs();
+		File saveImgFileName = new File(saveImgFileDir, bookImgName);
+		
+		try {
+			BufferedInputStream in = new BufferedInputStream(new FileInputStream(targetImgFile));
+			BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(saveImgFileName));
+			in.read(targetImgFileContents);
+			out.write(targetImgFileContents);
+			System.out.println(bookImgName + " 저장완료");
+			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	

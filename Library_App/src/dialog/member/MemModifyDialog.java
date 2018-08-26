@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -18,6 +19,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import book.BookDTO;
 import member.MemberDAO;
 import member.MemberDTO;
 
@@ -98,6 +100,7 @@ public class MemModifyDialog extends JDialog {
 		this.add(botPanel, BorderLayout.SOUTH);
 		
 		setSize(300, 450);
+		setResizable(false);
 		setLocationRelativeTo(null);
 		
 		loginShowProfile();
@@ -117,10 +120,13 @@ public class MemModifyDialog extends JDialog {
 				int age = Integer.parseInt(ageField.getText());
 				String phoneNum = phoneField.getText();
 				String address = addressField.getText();
+				HashMap<String, BookDTO> books_rentaled = member.getBooks_rentaled();
+				HashMap<String, BookDTO> books_reserved = member.getBooks_reserved();
+				
 				
 //				System.out.printf("%s, %s, %s, %d, %s, %s", id, pw, name, age, phoneNum, address);
-				
-				MemberDTO member = new MemberDTO(id, pw, name, age, phoneNum, address);
+
+				MemberDTO member = new MemberDTO(id, pw, name, age, phoneNum, address, books_rentaled, books_reserved);
 				memberDAO.addMem(id, member);
 				JOptionPane.showMessageDialog(null, "회원정보수정 성공!", "Alert", JOptionPane.INFORMATION_MESSAGE);
 				

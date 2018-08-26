@@ -1,6 +1,9 @@
 package member;
 
 import java.io.Serializable;
+import java.util.HashMap;
+
+import book.BookDTO;
 
 public class MemberDTO implements Serializable {
 	
@@ -14,20 +17,20 @@ public class MemberDTO implements Serializable {
 	private int age;
 	private String phoneNum;
 	private String address;
-	private int countRentalBook;
+	private HashMap<String, BookDTO> books_rentaled;
+	private HashMap<String, BookDTO> books_reserved;
 	
-	public MemberDTO() {
-		
-	}
 	
-	public MemberDTO(String id, String pw, String name, int age, String phoneNum, String address) { 
+	public MemberDTO(String id, String pw, String name, int age, String phoneNum, String address,
+			HashMap<String, BookDTO> books_rentaled, HashMap<String, BookDTO> books_reserved) {
 		this.id = id;
 		this.pw = pw;
-		Name = name;
+		this.Name = name;
 		this.age = age;
 		this.phoneNum = phoneNum;
 		this.address = address;
-		this.countRentalBook = 0;
+		this.books_rentaled = books_rentaled;
+		this.books_reserved = books_reserved;
 	}
 
 	public String getId() {
@@ -78,12 +81,20 @@ public class MemberDTO implements Serializable {
 		this.address = address;
 	}
 
-	public int getCountRentalBook() {
-		return countRentalBook;
+	public HashMap<String, BookDTO> getBooks_rentaled() {
+		return books_rentaled;
 	}
 
-	public void setCountRentalBook(int countRentalBook) {
-		this.countRentalBook = countRentalBook;
+	public void setBooks_rentaled(HashMap<String, BookDTO> books_rentaled) {
+		this.books_rentaled = books_rentaled;
+	}
+
+	public HashMap<String, BookDTO> getBooks_reserved() {
+		return books_reserved;
+	}
+
+	public void setBooks_reserved(HashMap<String, BookDTO> books_holdOn) {
+		this.books_reserved = books_holdOn;
 	}
 	
 	

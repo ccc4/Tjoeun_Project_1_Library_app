@@ -3,16 +3,11 @@ package dialog.book;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -20,15 +15,19 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import book.BookDAO;
 import book.BookDTO;
 import mainFrame.MainFrame;
+import panels.ImagePanel;
 
 public class BookAddDialog extends JDialog {
+	
 	BookDAO bookDAO;
-	File targetFile;
+//	File targetFile;
 	String bookName;
+	String targetImgFilePath = "";
 	
 	JPanel botPanel;
 	JPanel centerPanel;
@@ -54,14 +53,14 @@ public class BookAddDialog extends JDialog {
 	}
 	
 	public BookAddDialog(MainFrame frame, String title) {
-		super(frame, title);
+		super(frame, title, true);
 		
 		centerPanel = new JPanel(new GridLayout(1, 2));
 		botPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		
 		writePanel = new JPanel();
 		writePanel.setLayout(new BoxLayout(writePanel, BoxLayout.Y_AXIS));
-		imagePanel = new ImagePanel(".\\init\\unknown.jpg");  // 이미지가 들어오면 다시 변경해야함.
+		imagePanel = new ImagePanel();  // 이미지가 들어오면 다시 변경해야함.
 		centerPanel.add(writePanel);
 		centerPanel.add(imagePanel);
 		
@@ -87,6 +86,7 @@ public class BookAddDialog extends JDialog {
 		imagePanel.setBackground(Color.LIGHT_GRAY);
 		
 		setSize(300, 230);
+		setResizable(false);
 		setLocationRelativeTo(null);
 		
 		
@@ -107,15 +107,15 @@ public class BookAddDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 //				JFileChooser chooser = new JFileChooser(".\\Book Images");
 				JFileChooser chooser = new JFileChooser(".");
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Only JPG", "JPG");
+				chooser.setFileFilter(filter);
 				int ret = chooser.showOpenDialog(null);
 				if(ret != JFileChooser.APPROVE_OPTION) return;
 				
-				String targetFilePath = chooser.getSelectedFile().getPath();
-				targetFile = new File(targetFilePath);
+				targetImgFilePath = chooser.getSelectedFile().getPath();
+//				targetFile = new File(targetFilePath);
 //				byte[] targetContents = new byte[(int) targetFile.length()];
-				imagePanel.setImage(targetFilePath);
-				
-				
+				imagePanel.setImage(targetImgFilePath);
 			}
 		});
 		
@@ -124,47 +124,31 @@ public class BookAddDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				String bookName = titleField.getText();
-				String bookAuthor = authorField.getText();
-				int bookState = -2;
-				String rentaledByWho = null;
+				// 책 정보 등록
+				String bookName = titleField.getText().trim();
+				String bookAuthor = authorField.getText().trim();
+				String bookImgName = "";
+				if(!targetImgFilePath.trim().equals("")) {
+					bookImgName = bookName + targetImgFilePath.substring(targetImgFilePath.length()-4);
+				} 
 				
 //				System.out.printf("%s, %s, %d, %s", bookName, bookAuthor, bookState, rentaledByWho);
-				BookDTO newBook = new BookDTO(bookName, bookAuthor, bookState, rentaledByWho);
+				BookDTO newBook = new BookDTO(bookName, bookAuthor, -3, null, null, bookImgName);
 				if(bookDAO.checkExist(bookName)) {
 					JOptionPane.showMessageDialog(null, "이미 등록된 책입니다.", "Alert", JOptionPane.WARNING_MESSAGE);
 				} else {
 					bookDAO.addBook(bookName, newBook);
+					// 책 이미지 등록 (이미지가 있을 시)
+					if(!bookImgName.equals("")) {
+						bookDAO.addBookImg(bookImgName, targetImgFilePath);
+					} 
+					frame.bookListPanel.getList();
 					JOptionPane.showMessageDialog(null, "책 등록완료", "Alert", JOptionPane.INFORMATION_MESSAGE);
 				}
+				
 				setVisible(false);
 			}
 		});
 		
-	}
-
-
-
-	
-	class ImagePanel extends JPanel {
-		ImageIcon imageicon;
-		Image image;
-		
-		public ImagePanel(String location) {
-			imageicon = new ImageIcon(location);
-			image = imageicon.getImage();
-		}
-		
-		public void setImage(String location) {
-			imageicon = new ImageIcon(location);
-			image = imageicon.getImage();
-			repaint();
-		}
-		
-		@Override
-		protected void paintComponent(Graphics g) {
-			super.paintComponents(g);
-			g.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), this);
-		}
 	}
 }

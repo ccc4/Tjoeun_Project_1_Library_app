@@ -6,6 +6,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -32,11 +33,12 @@ public class MemJoinDialog extends JDialog {
 	public MemJoinDialog(MainFrame frame, String title) {
 		super(frame, title, true);
 		
-		JPanel centerPanel = new JPanel(new GridLayout(2, 1));
+		JPanel centerPanel = new JPanel();
+		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 		JPanel botPanel = new JPanel(new FlowLayout());
 		
-		JButton joinBtn = new JButton("Join");
-		JButton exitBtn = new JButton("Exit");
+		JButton joinBtn = new JButton("가입");
+		JButton exitBtn = new JButton("취소");
 		botPanel.add(joinBtn);
 		botPanel.add(exitBtn);
 		
@@ -48,9 +50,9 @@ public class MemJoinDialog extends JDialog {
 		JPanel A_LabelPanel = new JPanel(new GridLayout(5, 1));
 		JLabel idLabel = new JLabel("ID");
 		JLabel pwLabel = new JLabel("PW");
-		JLabel nameLabel = new JLabel("Name");
-		JLabel ageLabel = new JLabel("age");
-		JLabel phoneNumLabel = new JLabel("Phone");
+		JLabel nameLabel = new JLabel("이름");
+		JLabel ageLabel = new JLabel("나이");
+		JLabel phoneNumLabel = new JLabel("번호");
 		A_LabelPanel.add(idLabel);
 		A_LabelPanel.add(pwLabel);
 		A_LabelPanel.add(nameLabel);
@@ -72,7 +74,7 @@ public class MemJoinDialog extends JDialog {
 		A_Panel.add(A_LabelPanel, BorderLayout.WEST);
 		A_Panel.add(A_FieldPanel, BorderLayout.CENTER);
 		
-		JLabel addressLabel = new JLabel("Address");
+		JLabel addressLabel = new JLabel("주소");
 		JTextArea addressField = new JTextArea();
 		JScrollPane addressPanel = new JScrollPane(addressField);
 		
@@ -91,7 +93,8 @@ public class MemJoinDialog extends JDialog {
 		this.add(centerPanel, BorderLayout.CENTER);
 		this.add(botPanel, BorderLayout.SOUTH);
 		
-		setSize(300, 450);
+		setSize(200, 300);
+		setResizable(false);
 		setLocationRelativeTo(null);
 		
 		
@@ -114,16 +117,16 @@ public class MemJoinDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				// 회원가입 구현
 				
-				String id = idField.getText();
-				String pw = pwField.getText();
-				String name = nameField.getText();
-				int age = Integer.parseInt(ageField.getText());
-				String phoneNum = phoneField.getText();
-				String address = addressField.getText();
+				String id = idField.getText().trim();
+				String pw = pwField.getText().trim();
+				String name = nameField.getText().trim();
+				int age = Integer.parseInt(ageField.getText().trim());
+				String phoneNum = phoneField.getText().trim();
+				String address = addressField.getText().trim();
 				
 //				System.out.printf("%s, %s, %s, %d, %s, %s", id, pw, name, age, phoneNum, address);
 				
-				MemberDTO newMember = new MemberDTO(id, pw, name, age, phoneNum, address);
+				MemberDTO newMember = new MemberDTO(id, pw, name, age, phoneNum, address, null, null);
 				if(memberDAO.checkExist(id)) {
 					JOptionPane.showMessageDialog(null, "이미 가입된 아이디가 있습니다.", "Alert", JOptionPane.WARNING_MESSAGE);
 				} else {

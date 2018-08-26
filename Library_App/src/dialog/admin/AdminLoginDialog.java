@@ -26,8 +26,8 @@ public class AdminLoginDialog extends JDialog {
 		JPanel centerPanel = new JPanel(new BorderLayout());
 		JPanel botPanel = new JPanel(new GridLayout(1, 2));
 		
-		JButton loginBtn = new JButton("Login");
-		JButton ExitBtn = new JButton("Exit");
+		JButton loginBtn = new JButton("로그인");
+		JButton ExitBtn = new JButton("취소");
 		botPanel.add(loginBtn);
 		botPanel.add(ExitBtn);
 		
@@ -50,7 +50,8 @@ public class AdminLoginDialog extends JDialog {
 		idLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		pwLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
-		setSize(100, 150);
+		setSize(170, 130);
+		setResizable(false);
 		setLocationRelativeTo(null);
 		
 		
