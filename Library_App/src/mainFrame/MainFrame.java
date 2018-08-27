@@ -1,7 +1,6 @@
 package mainFrame;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,30 +9,20 @@ import java.util.HashMap;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
 import book.BookDAO;
-import book.BookDTO;
-import book.BookList;
-import dialog.admin.AdminLoginDialog;
-import dialog.book.BookAddDialog;
 import dialog.member.MemJoinDialog;
 import dialog.member.MemLoginDialog;
 import dialog.member.MemModifyDialog;
+import member.MemberDAO;
 import member.MemberDTO;
-import member.MemberList;
 import panels.BookListPanel;
 import panels.MemRentalPanel;
 import panels.MemReservePanel;
-import member.MemberDAO;
 
 public class MainFrame extends JFrame {
 
@@ -116,9 +105,10 @@ public class MainFrame extends JFrame {
 		splitPane.add(bookListPanel);
 		splitPane.add(memPanel);
 		
-		add(splitPane);
 		splitPane.setDividerLocation(500);
 		splitPane.setEnabled(false);
+		
+		add(splitPane);
 		
 		
 		// --------------------------------------------------------
@@ -207,6 +197,8 @@ public class MainFrame extends JFrame {
 			memLogoutBtn.setEnabled(true);
 			welcomeLabel.setText(sessionID + " 님 환영합니다."); 
 			
+			menubar.memberMenu.setVisible(true);
+			
 			bookListPanel.bookSearchBtn.setEnabled(true);
 			bookListPanel.rentalBtn.setEnabled(true);
 			bookListPanel.reserveBtn.setEnabled(true);
@@ -217,6 +209,8 @@ public class MainFrame extends JFrame {
 			memLogoutBtn.setEnabled(false);
 			membersMap = null;
 			welcomeLabel.setText("로그인 해주세요.");
+			
+			menubar.memberMenu.setVisible(false);
 			
 			bookListPanel.bookSearchBtn.setEnabled(false);
 			bookListPanel.rentalBtn.setEnabled(false);

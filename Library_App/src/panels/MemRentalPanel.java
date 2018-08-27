@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -33,7 +34,12 @@ public class MemRentalPanel extends JPanel {
 	
 	Object[][] contents = null;
 	Object[] column = {"제목", "저자", "반납일"};
-	DefaultTableModel model = new DefaultTableModel(contents, column);
+	DefaultTableModel model = new DefaultTableModel(contents, column) {
+		@Override
+		public boolean isCellEditable(int row, int column) {
+			return false;
+		}
+	};
 	JTable table = new JTable(model);
 	JScrollPane tablePanel = new JScrollPane(table);
 	
@@ -47,6 +53,7 @@ public class MemRentalPanel extends JPanel {
 		this.bookDAO = bookDAO;
 		this.memberDAO = memberDAO;
 		
+		this.setBorder(BorderFactory.createTitledBorder("회원 대여 정보"));
 		this.setLayout(new BorderLayout());
 		
 		btnPanel.add(returnBtn);
@@ -54,6 +61,9 @@ public class MemRentalPanel extends JPanel {
 		this.add(btnPanel, BorderLayout.SOUTH);
 		
 		table.addMouseListener(new TableSelectedRow());
+		table.getColumn("제목").setPreferredWidth(150);
+		table.getTableHeader().setReorderingAllowed(false);
+		table.getTableHeader().setResizingAllowed(false);
 		
 		returnBtn.setEnabled(false);
 		
@@ -85,6 +95,7 @@ public class MemRentalPanel extends JPanel {
 					memberDAO.addMem(sessionID, member);
 					
 					System.out.println(sessionID + " 님이 ( " + selectedBookName + " ) <반납>하셨습니다. / " + new Date());
+					JOptionPane.showMessageDialog(null, "반납이 완료되었습니다.", "반납 완료", JOptionPane.INFORMATION_MESSAGE);
 					returnBtn.setEnabled(false);
 					frame.bookListPanel.getList(); // 책 목록 갱신
 					frame.memRentalPanel.getList(); // 내 대여목록 갱신
@@ -103,6 +114,7 @@ public class MemRentalPanel extends JPanel {
 			books = new HashMap<>();
 		} else {
 			books = memberDAO.getMembers().get(sessionID).getBooks_rentaled();
+			if(books == null) books = new HashMap<>(); // 해당 코드 없을 시 회원가입 후 로그인 한 계정은 널포인트exception 발생.
 		}
 		
 		Set<String> keySet = books.keySet();

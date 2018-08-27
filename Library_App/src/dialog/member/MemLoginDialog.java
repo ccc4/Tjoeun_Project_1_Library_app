@@ -42,8 +42,8 @@ public class MemLoginDialog extends JDialog {
 		botPanel.add(loginBtn);
 		botPanel.add(ExitBtn);
 		
-		JLabel idLabel = new JLabel("ID");
-		JLabel pwLabel = new JLabel("PW");
+		JLabel idLabel = new JLabel("  ID  ");
+		JLabel pwLabel = new JLabel("  PW  ");
 		JPanel labelPanel = new JPanel(new GridLayout(2, 1));
 		labelPanel.add(idLabel);
 		labelPanel.add(pwLabel);
@@ -61,11 +61,9 @@ public class MemLoginDialog extends JDialog {
 		idLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		pwLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
-		setSize(170, 130);
-		setResizable(false);
+		this.setSize(100, 130);
+//		setResizable(false);
 		setLocationRelativeTo(null);
-		
-		
 		
 		ExitBtn.addActionListener(new ActionListener() {
 			
@@ -86,18 +84,18 @@ public class MemLoginDialog extends JDialog {
 					HashMap<String, MemberDTO> membersMap = memberDAO.getMembers();
 					MemberDTO member = membersMap.get(id);
 					if(member.getPw().equals(pw)) {
-						JOptionPane.showMessageDialog(null, "로그인 성공!", "Login Success", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(null, "로그인 성공!", "로그인 성공", JOptionPane.INFORMATION_MESSAGE);
 						frame.member_Login_Success(id);
 						frame.memRentalPanel.getList();
 						frame.memReservePanel.getList();
 						setVisible(false);
 						
 					} else {
-						JOptionPane.showMessageDialog(null, "로그인 실패!\n비밀번호 틀림", "Login Fail", JOptionPane.WARNING_MESSAGE);
+						JOptionPane.showMessageDialog(null, "로그인 실패!\n아이디와 비밀번호를 확인해주세요.", "로그인 실패", JOptionPane.WARNING_MESSAGE);
 						return;
 					}
 				} else {
-					JOptionPane.showMessageDialog(null, "로그인 실패!\n아이디 확인 필요", "Login Fail", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "로그인 실패!\n일치하는 회원정보가 존재하지 않습니다.", "로그인 실패", JOptionPane.WARNING_MESSAGE);
 					return;
 				}
 			}

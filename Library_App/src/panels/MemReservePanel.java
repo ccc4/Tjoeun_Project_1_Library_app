@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -32,7 +33,12 @@ public class MemReservePanel extends JPanel {
 	
 	Object[][] contents = null;
 	Object[] column = {"제목", "저자", "뭘쓸까"};
-	DefaultTableModel model = new DefaultTableModel(contents, column);
+	DefaultTableModel model = new DefaultTableModel(contents, column) {
+		@Override
+		public boolean isCellEditable(int row, int column) {
+			return false;
+		}
+	};
 	JTable table = new JTable(model);
 	JScrollPane tablePanel = new JScrollPane(table);
 	
@@ -47,6 +53,7 @@ public class MemReservePanel extends JPanel {
 		this.bookDAO = bookDAO;
 		this.memberDAO = memberDAO;
 		
+		this.setBorder(BorderFactory.createTitledBorder("회원 예약 정보"));
 		this.setLayout(new BorderLayout());
 		
 		btnPanel.add(rentalBtn);
@@ -55,6 +62,9 @@ public class MemReservePanel extends JPanel {
 		this.add(btnPanel, BorderLayout.SOUTH);
 		
 		table.addMouseListener(new TableSelectedRow());
+		table.getColumn("제목").setPreferredWidth(150);
+		table.getTableHeader().setReorderingAllowed(false);
+		table.getTableHeader().setResizingAllowed(false);
 		
 		rentalBtn.setEnabled(false);
 		reserveCancleBtn.setEnabled(false);
@@ -101,12 +111,13 @@ public class MemReservePanel extends JPanel {
 					memberDAO.addMem(sessionID, member);
 
 					System.out.println(sessionID + " 님이 ( " + selectedBookName + " ) <대여>하셨습니다. / " + new Date() + "(예약한 책 대여)");
+					JOptionPane.showMessageDialog(null, "대여가 완료되었습니다.", "대여 완료", JOptionPane.INFORMATION_MESSAGE);
+					rentalBtn.setEnabled(false);
+					reserveCancleBtn.setEnabled(false);
+					frame.bookListPanel.getList(); // 책 목록 갱신
+					frame.memRentalPanel.getList(); // 내 대여목록 갱신
+					frame.memReservePanel.getList(); // 내 예약목록 갱신
 				}
-				rentalBtn.setEnabled(false);
-				reserveCancleBtn.setEnabled(false);
-				frame.bookListPanel.getList(); // 책 목록 갱신
-				frame.memRentalPanel.getList(); // 내 대여목록 갱신
-				frame.memReservePanel.getList(); // 내 예약목록 갱신
 
 			}
 		});
@@ -136,6 +147,7 @@ public class MemReservePanel extends JPanel {
 					memberDAO.addMem(sessionID, member);
 					
 					System.out.println(sessionID + " 님이 ( " + selectedBookName + " ) <예약취소>하셨습니다. / " + new Date());
+					JOptionPane.showMessageDialog(null, "예약취소가 완료되었습니다.", "예약취소", JOptionPane.INFORMATION_MESSAGE);
 					rentalBtn.setEnabled(false);
 					reserveCancleBtn.setEnabled(false);
 					frame.bookListPanel.getList(); // 책 목록 갱신
@@ -154,6 +166,7 @@ public class MemReservePanel extends JPanel {
 			books = new HashMap<>();
 		} else {
 			books = memberDAO.getMembers().get(sessionID).getBooks_reserved();
+			if(books == null) books = new HashMap<>();
 		}
 		
 		Set<String> keySet = books.keySet();

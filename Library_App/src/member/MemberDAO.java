@@ -39,7 +39,7 @@ public class MemberDAO {
 			BufferedReader check = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 			if(check.readLine() == null) {
 				members = new HashMap<>();
-				System.out.println("파일없어서 새로 만듦");
+				System.out.println("New members.txt 파일 생성");
 				saveMembersToFile(members);
 			} else {
 //				BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
@@ -68,7 +68,7 @@ public class MemberDAO {
 			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
 			out.writeObject(members);
 			out.flush();
-			System.out.println("Members Save Success!");
+//			System.out.println("Members Save Success!");
 			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();

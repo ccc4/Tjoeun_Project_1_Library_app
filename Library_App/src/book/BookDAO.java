@@ -41,7 +41,7 @@ public class BookDAO {
 			BufferedReader check = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 			if(check.readLine() == null) {
 				books = new HashMap<>();
-				System.out.println("파일없어서 새로 만듦");
+				System.out.println("New Books.txt 파일 생성");
 				saveBooksToFile(books);
 //				idx = 0;
 			} else {
@@ -74,7 +74,7 @@ public class BookDAO {
 			
 			// 이미지 저장 구현할 곳
 			
-			System.out.println("Books Save Success!");
+//			System.out.println("Books Save Success!");
 			bookOut.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -90,15 +90,16 @@ public class BookDAO {
 		File saveImgFileDir = new File(BOOK_IMAGES_DIR);
 		if(!saveImgFileDir.exists()) saveImgFileDir.mkdirs();
 		File saveImgFileName = new File(saveImgFileDir, bookImgName);
-		
 		try {
 			BufferedInputStream in = new BufferedInputStream(new FileInputStream(targetImgFile));
 			BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(saveImgFileName));
 			in.read(targetImgFileContents);
 			out.write(targetImgFileContents);
+			out.flush();
 			System.out.println(bookImgName + " 저장완료");
 			
-			
+			out.close();
+			in.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

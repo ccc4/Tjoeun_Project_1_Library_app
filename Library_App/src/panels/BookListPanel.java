@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -47,7 +48,12 @@ public class BookListPanel extends JPanel {
 	
 	Object[][] contents = null;
 	Object[] column = {"제목", "저자", "대여여부"};
-	DefaultTableModel model = new DefaultTableModel(contents, column);
+	DefaultTableModel model = new DefaultTableModel(contents, column) { // 셀 더블클릭 수정불가 오버라이딩
+		@Override
+		public boolean isCellEditable(int row, int column) {
+			return false;
+		}
+	};
 	JTable table = new JTable(model);
 	JScrollPane tablePanel = new JScrollPane(table);
 	
@@ -58,6 +64,7 @@ public class BookListPanel extends JPanel {
 		this.bookDAO = bookDAO;
 		this.memberDAO = memberDAO;
 		
+//		this.setBorder(BorderFactory.createTitledBorder("책 목록")); //  별로 보기 안좋음
 		this.setLayout(new BorderLayout());
 		
 		bookSearchPanel.add(bookSearchBtn);
@@ -75,6 +82,9 @@ public class BookListPanel extends JPanel {
 		this.add(botPanel, BorderLayout.SOUTH);
 		
 		table.addMouseListener(new TableSelectedRow());
+		table.getColumn("제목").setPreferredWidth(200);
+		table.getTableHeader().setReorderingAllowed(false);
+		table.getTableHeader().setResizingAllowed(false);
 		
 		returnBtn.setEnabled(false); // 평상시엔 비활성화.. 선택한 책이 대여중일 책일 경우 활성화 
 		reserveCancleBtn.setEnabled(false); // 평상시엔 비활성화.. 선택한 책이 예약중일 책일 경우 활성화 
@@ -130,10 +140,9 @@ public class BookListPanel extends JPanel {
 						memberDAO.addMem(sessionID, member); // 예약목록에 추가
 						
 						System.out.println(sessionID + " 님이 ( " + selectedBookName + " ) <대여>하셨습니다. / " + new Date());
-					}
-					
-					// 예약된 책일 경우
-					if(selectedBookState == -2 && book.getReservedByWho().equals(sessionID)) {
+						
+					} else if(selectedBookState == -2 && book.getReservedByWho().equals(sessionID)) {
+						// 예약된 책일 경우
 						book.setBookState(-1);
 						book.setRentaledByWho(sessionID);
 						book.setReservedByWho(null);
@@ -159,6 +168,7 @@ public class BookListPanel extends JPanel {
 						
 						System.out.println(sessionID + " 님이 ( " + selectedBookName + " ) <대여>하셨습니다. / " + new Date() + "(예약한 책 대여)");
 					}
+					JOptionPane.showMessageDialog(null, "대여가 완료되었습니다.", "대여 완료", JOptionPane.INFORMATION_MESSAGE);
 					frame.bookListPanel.getList(); // 책 목록 갱신
 					frame.memRentalPanel.getList(); // 내 대여목록 갱신
 					frame.memReservePanel.getList(); // 내 예약목록 갱신
@@ -204,6 +214,7 @@ public class BookListPanel extends JPanel {
 				memberDAO.addMem(sessionID, member); // 예약목록에 추가
 				
 				System.out.println(sessionID + " 님이 ( " + selectedBookName + " ) <예약>하셨습니다. / " + new Date());
+				JOptionPane.showMessageDialog(null, "예약이 완료되었습니다.", "예약 완료", JOptionPane.INFORMATION_MESSAGE);
 				frame.bookListPanel.getList(); // 책 목록 갱신
 				frame.memRentalPanel.getList(); // 내 대여목록 갱신
 				frame.memReservePanel.getList(); // 내 예약목록 갱신
@@ -241,6 +252,7 @@ public class BookListPanel extends JPanel {
 					
 					returnBtn.setEnabled(false);
 					System.out.println(sessionID + " 님이 ( " + selectedBookName + " ) <반납>하셨습니다. / " + new Date());
+					JOptionPane.showMessageDialog(null, "반납이 완료되었습니다.", "반납 완료", JOptionPane.INFORMATION_MESSAGE);
 					frame.bookListPanel.getList(); // 책 목록 갱신
 					frame.memRentalPanel.getList(); // 내 대여목록 갱신
 					frame.memReservePanel.getList(); // 내 예약목록 갱신
@@ -278,6 +290,7 @@ public class BookListPanel extends JPanel {
 					
 					reserveCancleBtn.setEnabled(false);
 					System.out.println(sessionID + " 님이 ( " + selectedBookName + " ) <예약취소>하셨습니다. / " + new Date());
+					JOptionPane.showMessageDialog(null, "예약취소가 완료되었습니다.", "예약취소", JOptionPane.INFORMATION_MESSAGE);
 					frame.bookListPanel.getList(); // 책 목록 갱신
 					frame.memRentalPanel.getList(); // 내 대여목록 갱신
 					frame.memReservePanel.getList(); // 내 예약목록 갱신
@@ -290,7 +303,7 @@ public class BookListPanel extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				BookSearchDialog bookSearchDialog = new BookSearchDialog(frame, "책 검색");
+				BookSearchDialog bookSearchDialog = new BookSearchDialog(frame, "책 검색", bookDAO, memberDAO);
 				bookSearchDialog.setVisible(true);
 			}
 		});
@@ -334,14 +347,9 @@ public class BookListPanel extends JPanel {
 //			System.out.println(selectedBookState);
 			String bookImgName = bookDAO.getBooks().get(selectedBookName).getBookImgName();
 			if(bookImgName.trim().length() == 0) {
-//				System.out.println("null");
-				bookImgLabel.setImage(".\\init\\not_Exist.jpg");
-//				bookImgLabel.setImage(bookImgName);
+				bookImgLabel.setNoImage();
 			} else {
-//				System.out.println("exist");
-//				System.out.println(bookImgName);
-//				bookImgLabel.setImage(bookImgName);
-				bookImgLabel.setImage(".\\init\\11.jpg");
+				bookImgLabel.setSaveImage(bookImgName);
 			}
 			
 			String sessionID = frame.getSessionID();

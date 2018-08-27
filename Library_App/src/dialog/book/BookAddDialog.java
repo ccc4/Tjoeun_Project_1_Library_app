@@ -25,28 +25,26 @@ import panels.ImagePanel;
 public class BookAddDialog extends JDialog {
 	
 	BookDAO bookDAO;
-//	File targetFile;
 	String bookName;
 	String targetImgFilePath = "";
 	
-	JPanel botPanel;
-	JPanel centerPanel;
-	
-	JPanel writePanel;
+	JPanel contentPanel = new JPanel(new BorderLayout());
+	JPanel botPanel = new JPanel(new GridLayout(3, 1));
 	ImagePanel imagePanel; // 이미지패널
-	
-	JPanel writePanel_1 = new JPanel(new BorderLayout());
-	JPanel writePanel_2 = new JPanel(new BorderLayout());
-	JPanel writePanel_3 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 	
 	JLabel titleLabel = new JLabel("  제목  ");
 	JTextField titleField = new JTextField();
 	JLabel authorLabel = new JLabel("  저자  ");
 	JTextField authorField = new JTextField();
 	JButton imgBtn = new JButton("이미지");
-	
 	JButton addBtn = new JButton("등록");
-	JButton exitBtn = new JButton("취소");
+//	JButton exitBtn = new JButton("취소");
+	
+	JPanel writePanel_1 = new JPanel(new BorderLayout());
+	JPanel writePanel_2 = new JPanel(new BorderLayout());
+	JPanel writePanel_3 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+	
+	
 
 	public void setBookDAO(BookDAO bookDAO) {
 		this.bookDAO = bookDAO;
@@ -55,51 +53,39 @@ public class BookAddDialog extends JDialog {
 	public BookAddDialog(MainFrame frame, String title) {
 		super(frame, title, true);
 		
-		centerPanel = new JPanel(new GridLayout(1, 2));
-		botPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		
-		writePanel = new JPanel();
-		writePanel.setLayout(new BoxLayout(writePanel, BoxLayout.Y_AXIS));
-		imagePanel = new ImagePanel();  // 이미지가 들어오면 다시 변경해야함.
-		centerPanel.add(writePanel);
-		centerPanel.add(imagePanel);
-		
-		writePanel.add(writePanel_1);
-		writePanel.add(writePanel_2);
-		writePanel.add(writePanel_3);
-		
 		writePanel_1.add(titleLabel, BorderLayout.WEST);
 		writePanel_1.add(titleField, BorderLayout.CENTER);
 		writePanel_2.add(authorLabel, BorderLayout.WEST);
 		writePanel_2.add(authorField, BorderLayout.CENTER);
 		writePanel_3.add(imgBtn);
+		writePanel_3.add(addBtn);
+		botPanel.add(writePanel_1);
+		botPanel.add(writePanel_2);
+		botPanel.add(writePanel_3);
 		
+		imagePanel = new ImagePanel();
 		
-		botPanel.add(addBtn);
-		botPanel.add(exitBtn);
+		contentPanel.add(imagePanel, BorderLayout.CENTER);
+		contentPanel.add(botPanel, BorderLayout.SOUTH);
 		
-		
-		this.add(centerPanel, BorderLayout.CENTER);
-		this.add(botPanel, BorderLayout.SOUTH);
+		this.add(contentPanel);
 		
 		imagePanel.setOpaque(true);
 		imagePanel.setBackground(Color.LIGHT_GRAY);
 		
-		setSize(300, 230);
+		setSize(100, 430);
 		setResizable(false);
 		setLocationRelativeTo(null);
 		
 		
 		
-		
-		
-		exitBtn.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-			}
-		});
+//		exitBtn.addActionListener(new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				setVisible(false);
+//			}
+//		});
 		
 		imgBtn.addActionListener(new ActionListener() {
 			
@@ -113,9 +99,8 @@ public class BookAddDialog extends JDialog {
 				if(ret != JFileChooser.APPROVE_OPTION) return;
 				
 				targetImgFilePath = chooser.getSelectedFile().getPath();
-//				targetFile = new File(targetFilePath);
-//				byte[] targetContents = new byte[(int) targetFile.length()];
-				imagePanel.setImage(targetImgFilePath);
+				System.out.println(targetImgFilePath);
+				imagePanel.setLocationImage2(targetImgFilePath);
 			}
 		});
 		
@@ -131,7 +116,6 @@ public class BookAddDialog extends JDialog {
 				if(!targetImgFilePath.trim().equals("")) {
 					bookImgName = bookName + targetImgFilePath.substring(targetImgFilePath.length()-4);
 				} 
-				
 //				System.out.printf("%s, %s, %d, %s", bookName, bookAuthor, bookState, rentaledByWho);
 				BookDTO newBook = new BookDTO(bookName, bookAuthor, -3, null, null, bookImgName);
 				if(bookDAO.checkExist(bookName)) {

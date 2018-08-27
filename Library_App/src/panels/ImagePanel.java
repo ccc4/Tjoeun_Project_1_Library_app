@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 public class ImagePanel extends JPanel {
 	private final String DEFAULT_BOOK_IMAGE = ".\\init\\default.jpg";
 	private final String NOT_EXIST_BOOK_IMAGE = ".\\init\\not_Exist.jpg";
+	private final String SAVE_IMAGES_DIR = ".\\init\\Book_Images\\";
 	
 	ImageIcon imageicon;
 	Image image;
@@ -19,27 +20,37 @@ public class ImagePanel extends JPanel {
 		image = imageicon.getImage();
 	}
 	
-	public ImagePanel(String location) {
-		imageicon = new ImageIcon(location);
-		image = imageicon.getImage();
-	}
-	
-	public void setImage(String location) {
+//	public ImagePanel(String location) {
+//		imageicon = new ImageIcon(location);
+//		image = imageicon.getImage();
+//	}
+//	
+	public void setLocationImage2(String location) {
 		imageicon = new ImageIcon(location);
 		image = imageicon.getImage();
 		repaint();
 	}
-	
-	public void checkImage(String location) {
-		File file = new File(location);
-		if(file.exists()) {
-			imageicon = new ImageIcon(location);
-		} else {
-			imageicon = new ImageIcon(NOT_EXIST_BOOK_IMAGE);
-		}
+	public void setSaveImage(String location) {
+		imageicon = new ImageIcon(SAVE_IMAGES_DIR + location);
 		image = imageicon.getImage();
-		repaint( );
+		repaint();
 	}
+	public void setDefaultImage() {
+		imageicon = new ImageIcon(DEFAULT_BOOK_IMAGE);
+		image = imageicon.getImage();
+		repaint();
+	}
+	public void setNoImage() {
+		imageicon = new ImageIcon(NOT_EXIST_BOOK_IMAGE);
+		image = imageicon.getImage();
+		repaint();
+	}
+//	
+//	public void checkImage(String location) {
+//		imageicon = new ImageIcon(".\\init\\Book_Images\\" + location);
+//		image = imageicon.getImage();
+//		repaint();
+//	}
 	
 	@Override
 	protected void paintComponent(Graphics g) {

@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -42,7 +43,8 @@ public class MemModifyDialog extends JDialog {
 		
 		this.setLayout(new BorderLayout());
 		
-		JPanel centerPanel = new JPanel(new GridLayout(2, 1));
+		JPanel centerPanel = new JPanel();
+		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 		JPanel botPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		
 		modifyBtn = new JButton("Modify");
@@ -54,11 +56,11 @@ public class MemModifyDialog extends JDialog {
 		centerPanel.add(B_Panel);
 		
 		JPanel A_LabelPanel = new JPanel(new GridLayout(5, 1));
-		JLabel idLabel = new JLabel("ID");
-		JLabel pwLabel = new JLabel("PW");
-		JLabel nameLabel = new JLabel("Name");
-		JLabel ageLabel = new JLabel("age");
-		JLabel phoneNumLabel = new JLabel("Phone");
+		JLabel idLabel = new JLabel("  ID  ");
+		JLabel pwLabel = new JLabel("  PW  ");
+		JLabel nameLabel = new JLabel("  이름  ");
+		JLabel ageLabel = new JLabel("  나이  ");
+		JLabel phoneNumLabel = new JLabel("  번호  ");
 		A_LabelPanel.add(idLabel);
 		A_LabelPanel.add(pwLabel);
 		A_LabelPanel.add(nameLabel);
@@ -80,7 +82,7 @@ public class MemModifyDialog extends JDialog {
 		A_Panel.add(A_LabelPanel, BorderLayout.WEST);
 		A_Panel.add(A_FieldPanel, BorderLayout.CENTER);
 		
-		JLabel addressLabel = new JLabel("Address");
+		JLabel addressLabel = new JLabel("  주소  ");
 		addressField = new JTextArea();
 		JScrollPane addressPanel = new JScrollPane(addressField);
 		
@@ -94,12 +96,13 @@ public class MemModifyDialog extends JDialog {
 		phoneNumLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		addressLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		idField.setEditable(false);
+		pwField.setEditable(false);
 
 		
 		this.add(centerPanel, BorderLayout.CENTER);
 		this.add(botPanel, BorderLayout.SOUTH);
 		
-		setSize(300, 450);
+		setSize(200, 300);
 		setResizable(false);
 		setLocationRelativeTo(null);
 		
