@@ -105,11 +105,12 @@ public class MainFrame extends JFrame {
 		splitPane.add(bookListPanel);
 		splitPane.add(memPanel);
 		
-		splitPane.setDividerLocation(500);
-		splitPane.setEnabled(false);
 		
 		add(splitPane);
 		
+//		splitPane.setDividerLocation(500);
+		splitPane.setResizeWeight(.9);
+		splitPane.setEnabled(false);
 		
 		// --------------------------------------------------------
 		
@@ -118,7 +119,7 @@ public class MainFrame extends JFrame {
 		generateEvents(this);
 		
 		this.setSize(700, 400);
-		this.setResizable(false);
+//		this.setResizable(false);
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}

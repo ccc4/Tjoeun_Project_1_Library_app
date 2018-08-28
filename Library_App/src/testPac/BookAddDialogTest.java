@@ -3,10 +3,19 @@ package testPac;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.List;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -20,6 +29,8 @@ public class BookAddDialogTest extends JFrame {
 	BookAddDialogTest frame;
 	
 	JButton btn;
+	
+	
 	public BookAddDialogTest() {
 		super("test");
 		this.frame = this;
@@ -32,6 +43,7 @@ public class BookAddDialogTest extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				Dialog test = new Dialog(frame, "力格");
 				test.setVisible(true);
+				
 			}
 		});
 		
@@ -39,6 +51,7 @@ public class BookAddDialogTest extends JFrame {
 		setSize(200, 200);
 		setLocationRelativeTo(null);
 		setVisible(true);
+		
 	}
 	
 	public static void main(String[] args) {
@@ -46,9 +59,10 @@ public class BookAddDialogTest extends JFrame {
 	}
 	
 	class Dialog extends JDialog{
+		DropTarget dt;
 		JPanel contentPanel = new JPanel(new BorderLayout());
 		JPanel botPanel = new JPanel(new GridLayout(3, 1));
-		ImagePanel imagePanel;
+		JPanel imagePanel;
 		JLabel titleLabel = new JLabel("力格");
 		JLabel authorLabel = new JLabel("历磊");
 		JTextField titleField = new JTextField();
@@ -63,7 +77,7 @@ public class BookAddDialogTest extends JFrame {
 			super(frame, title, true);
 			
 			
-			imagePanel = new ImagePanel();
+			imagePanel = new JPanel();
 			writePanel_1.add(titleLabel, BorderLayout.WEST);
 			writePanel_1.add(titleField, BorderLayout.CENTER);
 			writePanel_2.add(authorLabel, BorderLayout.WEST);
@@ -81,6 +95,57 @@ public class BookAddDialogTest extends JFrame {
 			
 			this.setSize(100, 430);
 			this.setLocationRelativeTo(null);
+			
+//			imagePanel.addComponentListener(new DropTargetAdapter() {
+//				
+//				@Override
+//				public void drop(DropTargetDropEvent dtde) {
+//					dtde.acceptDrop(dtde.getDropAction());
+//					Transferable tf = dtde.getTransferable();
+//					try {
+//						List list = (List) tf.getTransferData(DataFlavor.javaFileListFlavor);
+//						File imageFile = (File)list.get(0);
+//						String imageFilePath = imageFile.getAbsolutePath();
+//						ImageIcon icon = new ImageIcon(imageFilePath);
+//						imagePanel.setIcon(icon);
+//
+//						/*
+//						for (int i = 0; i < list.size(); i++)
+//							System.out.println("" + list.get(i));
+//						*/
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
+//					
+//				}
+//			});
+			
+			
+			
+			
+			
+//			dt = new DropTarget(imagePanel, DnDConstants.ACTION_COPY_OR_MOVE, new DropTargetAdapter() {
+//				
+//				@Override
+//				public void drop(DropTargetDropEvent dtde) {
+//					dtde.acceptDrop(dtde.getDropAction());
+//					Transferable tf = dtde.getTransferable();
+//					try {
+//						List list = (List) tf.getTransferData(DataFlavor.javaFileListFlavor);
+//						File imageFile = (File)list.get(0);
+//						String imageFilePath = imageFile.getAbsolutePath();
+//						ImageIcon icon = new ImageIcon(imageFilePath);
+//						imagePanel.setIcon(icon);
+//
+//						/*
+//						for (int i = 0; i < list.size(); i++)
+//							System.out.println("" + list.get(i));
+//						*/
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
+//				}
+//			}, true, null);
 		}
 		
 	}

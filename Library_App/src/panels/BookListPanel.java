@@ -29,22 +29,20 @@ import member.MemberDAO;
 import member.MemberDTO;
 
 public class BookListPanel extends JPanel {
-	private MainFrame frame;
 	private BookDAO bookDAO;
-	private MemberDAO memberDAO;
 	private String selectedBookName;
 	private int selectedBookState;
 	
 	JSplitPane centerPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 	JPanel botPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 	
-	public JButton bookSearchBtn = new JButton("책 검색"); // 준비중
+	public JButton bookSearchBtn = new JButton("책 검색");
 	JPanel bookSearchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 	
 	public JButton rentalBtn = new JButton("대여");
-	public JButton returnBtn = new JButton("반납");
+//	public JButton returnBtn = new JButton("반납");
 	public JButton reserveBtn = new JButton("예약");
-	public JButton reserveCancleBtn = new JButton("예약취소");
+//	public JButton reserveCancleBtn = new JButton("예약취소");
 	
 	Object[][] contents = null;
 	Object[] column = {"제목", "저자", "대여여부"};
@@ -60,19 +58,16 @@ public class BookListPanel extends JPanel {
 	ImagePanel bookImgLabel = new ImagePanel(); // 이미지 불러오는 곳
 	
 	public BookListPanel(MainFrame frame, BookDAO bookDAO, MemberDAO memberDAO) {
-		this.frame = frame;
 		this.bookDAO = bookDAO;
-		this.memberDAO = memberDAO;
 		
-//		this.setBorder(BorderFactory.createTitledBorder("책 목록")); //  별로 보기 안좋음
 		this.setLayout(new BorderLayout());
 		
 		bookSearchPanel.add(bookSearchBtn);
 		
 		botPanel.add(rentalBtn);
-		botPanel.add(returnBtn);
+//		botPanel.add(returnBtn);
 		botPanel.add(reserveBtn);
-		botPanel.add(reserveCancleBtn);
+//		botPanel.add(reserveCancleBtn);
 		
 		centerPanel.add(tablePanel);
 		centerPanel.add(bookImgLabel);
@@ -86,10 +81,11 @@ public class BookListPanel extends JPanel {
 		table.getTableHeader().setReorderingAllowed(false);
 		table.getTableHeader().setResizingAllowed(false);
 		
-		returnBtn.setEnabled(false); // 평상시엔 비활성화.. 선택한 책이 대여중일 책일 경우 활성화 
-		reserveCancleBtn.setEnabled(false); // 평상시엔 비활성화.. 선택한 책이 예약중일 책일 경우 활성화 
+//		returnBtn.setEnabled(false); // 평상시엔 비활성화.. 선택한 책이 대여중일 책일 경우 활성화 
+//		reserveCancleBtn.setEnabled(false); // 평상시엔 비활성화.. 선택한 책이 예약중일 책일 경우 활성화 
 		
-		centerPanel.setDividerLocation(300);
+//		centerPanel.setDividerLocation(300);
+		centerPanel.setResizeWeight(.6);
 		centerPanel.setEnabled(false);
 		
 		getList();
@@ -222,81 +218,81 @@ public class BookListPanel extends JPanel {
 		});
 		
 		
-		this.returnBtn.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				if (selectedBookState < -1) {
-					JOptionPane.showMessageDialog(null, "잘못된접근", "ERROR", JOptionPane.WARNING_MESSAGE);
-					return;
-				}
-
-				String sessionID = frame.getSessionID();
-				BookDTO book = bookDAO.getBooks().get(selectedBookName);
-
-				if (sessionID.equals(book.getRentaledByWho())) {
-					int check = JOptionPane.showConfirmDialog(null, "이 도서를 반납하시겠습니까?", "책 반납", JOptionPane.YES_NO_OPTION);
-					if (check != JOptionPane.YES_OPTION) return;
-
-					book.setBookState(-3);
-					book.setRentaledByWho(null);
-					bookDAO.addBook(selectedBookName, book);
-					
-					MemberDTO member = memberDAO.getMembers().get(sessionID);
-					HashMap<String, BookDTO> inputMember;
-					inputMember = member.getBooks_rentaled();
-					inputMember.remove(selectedBookName);
-					member.setBooks_rentaled(inputMember);
-					memberDAO.addMem(sessionID, member);
-					
-					returnBtn.setEnabled(false);
-					System.out.println(sessionID + " 님이 ( " + selectedBookName + " ) <반납>하셨습니다. / " + new Date());
-					JOptionPane.showMessageDialog(null, "반납이 완료되었습니다.", "반납 완료", JOptionPane.INFORMATION_MESSAGE);
-					frame.bookListPanel.getList(); // 책 목록 갱신
-					frame.memRentalPanel.getList(); // 내 대여목록 갱신
-					frame.memReservePanel.getList(); // 내 예약목록 갱신
-				}
-			}
-		});
-		
-		
-		this.reserveCancleBtn.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (selectedBookState != -2) {
-					JOptionPane.showMessageDialog(null, "잘못된접근", "ERROR", JOptionPane.WARNING_MESSAGE);
-					return;
-				}
-
-				String sessionID = frame.getSessionID();
-				BookDTO book = bookDAO.getBooks().get(selectedBookName);
-
-				if (sessionID.equals(book.getReservedByWho())) {
-					int check = JOptionPane.showConfirmDialog(null, "이 도서의 예약을 취소하시겠습니까?", "책 예약취소", JOptionPane.YES_NO_OPTION);
-					if (check != JOptionPane.YES_OPTION) return;
-
-					book.setBookState(-3);
-					book.setReservedByWho(null);
-					bookDAO.addBook(selectedBookName, book);
-					
-					MemberDTO member = memberDAO.getMembers().get(sessionID);
-					HashMap<String, BookDTO> inputMember;
-					inputMember = member.getBooks_reserved();
-					inputMember.remove(selectedBookName);
-					member.setBooks_reserved(inputMember);
-					memberDAO.addMem(sessionID, member);
-					
-					reserveCancleBtn.setEnabled(false);
-					System.out.println(sessionID + " 님이 ( " + selectedBookName + " ) <예약취소>하셨습니다. / " + new Date());
-					JOptionPane.showMessageDialog(null, "예약취소가 완료되었습니다.", "예약취소", JOptionPane.INFORMATION_MESSAGE);
-					frame.bookListPanel.getList(); // 책 목록 갱신
-					frame.memRentalPanel.getList(); // 내 대여목록 갱신
-					frame.memReservePanel.getList(); // 내 예약목록 갱신
-				}
-			}
-		});
+//		this.returnBtn.addActionListener(new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//
+//				if (selectedBookState < -1) {
+//					JOptionPane.showMessageDialog(null, "잘못된접근", "ERROR", JOptionPane.WARNING_MESSAGE);
+//					return;
+//				}
+//
+//				String sessionID = frame.getSessionID();
+//				BookDTO book = bookDAO.getBooks().get(selectedBookName);
+//
+//				if (sessionID.equals(book.getRentaledByWho())) {
+//					int check = JOptionPane.showConfirmDialog(null, "이 도서를 반납하시겠습니까?", "책 반납", JOptionPane.YES_NO_OPTION);
+//					if (check != JOptionPane.YES_OPTION) return;
+//
+//					book.setBookState(-3);
+//					book.setRentaledByWho(null);
+//					bookDAO.addBook(selectedBookName, book);
+//					
+//					MemberDTO member = memberDAO.getMembers().get(sessionID);
+//					HashMap<String, BookDTO> inputMember;
+//					inputMember = member.getBooks_rentaled();
+//					inputMember.remove(selectedBookName);
+//					member.setBooks_rentaled(inputMember);
+//					memberDAO.addMem(sessionID, member);
+//					
+//					returnBtn.setEnabled(false);
+//					System.out.println(sessionID + " 님이 ( " + selectedBookName + " ) <반납>하셨습니다. / " + new Date());
+//					JOptionPane.showMessageDialog(null, "반납이 완료되었습니다.", "반납 완료", JOptionPane.INFORMATION_MESSAGE);
+//					frame.bookListPanel.getList(); // 책 목록 갱신
+//					frame.memRentalPanel.getList(); // 내 대여목록 갱신
+//					frame.memReservePanel.getList(); // 내 예약목록 갱신
+//				}
+//			}
+//		});
+//		
+//		
+//		this.reserveCancleBtn.addActionListener(new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				if (selectedBookState != -2) {
+//					JOptionPane.showMessageDialog(null, "잘못된접근", "ERROR", JOptionPane.WARNING_MESSAGE);
+//					return;
+//				}
+//
+//				String sessionID = frame.getSessionID();
+//				BookDTO book = bookDAO.getBooks().get(selectedBookName);
+//
+//				if (sessionID.equals(book.getReservedByWho())) {
+//					int check = JOptionPane.showConfirmDialog(null, "이 도서의 예약을 취소하시겠습니까?", "책 예약취소", JOptionPane.YES_NO_OPTION);
+//					if (check != JOptionPane.YES_OPTION) return;
+//
+//					book.setBookState(-3);
+//					book.setReservedByWho(null);
+//					bookDAO.addBook(selectedBookName, book);
+//					
+//					MemberDTO member = memberDAO.getMembers().get(sessionID);
+//					HashMap<String, BookDTO> inputMember;
+//					inputMember = member.getBooks_reserved();
+//					inputMember.remove(selectedBookName);
+//					member.setBooks_reserved(inputMember);
+//					memberDAO.addMem(sessionID, member);
+//					
+//					reserveCancleBtn.setEnabled(false);
+//					System.out.println(sessionID + " 님이 ( " + selectedBookName + " ) <예약취소>하셨습니다. / " + new Date());
+//					JOptionPane.showMessageDialog(null, "예약취소가 완료되었습니다.", "예약취소", JOptionPane.INFORMATION_MESSAGE);
+//					frame.bookListPanel.getList(); // 책 목록 갱신
+//					frame.memRentalPanel.getList(); // 내 대여목록 갱신
+//					frame.memReservePanel.getList(); // 내 예약목록 갱신
+//				}
+//			}
+//		});
 		
 		
 		this.bookSearchBtn.addActionListener(new ActionListener() {
@@ -339,12 +335,10 @@ public class BookListPanel extends JPanel {
 	class TableSelectedRow extends MouseAdapter {
 		@Override
 		public void mousePressed(MouseEvent e) {
-			returnBtn.setEnabled(false); // 누를 때 기본은 false
-			reserveCancleBtn.setEnabled(false); // 누를 때 기본은 false
+//			returnBtn.setEnabled(false); // 누를 때 기본은 false
+//			reserveCancleBtn.setEnabled(false); // 누를 때 기본은 false
 			selectedBookName = (String) table.getModel().getValueAt(table.getSelectedRow(), 0);
 			selectedBookState = bookDAO.getBooks().get(selectedBookName).getBookState();
-//			System.out.println(selectedBookName);
-//			System.out.println(selectedBookState);
 			String bookImgName = bookDAO.getBooks().get(selectedBookName).getBookImgName();
 			if(bookImgName.trim().length() == 0) {
 				bookImgLabel.setNoImage();
@@ -352,18 +346,18 @@ public class BookListPanel extends JPanel {
 				bookImgLabel.setSaveImage(bookImgName);
 			}
 			
-			String sessionID = frame.getSessionID();
-			BookDTO book = bookDAO.getBooks().get(selectedBookName);
-			if(sessionID != null) {
-				// 접속한 아이디로 해당 책이 대여중일 경우 반납 버튼 활성화
-				if(sessionID.equals(book.getRentaledByWho())) { // sessionID 를 앞에 쓴 이유는 book.getRentaledByWho() 가 null 일 경우를 대비해서
-					returnBtn.setEnabled(true);
-				}
-				// 접속한 아이디로 해당 책이 예약중일 경우 예약취소 버튼 활성화
-				if(sessionID.equals(book.getReservedByWho())) {
-					reserveCancleBtn.setEnabled(true);
-				}
-			}
+//			String sessionID = frame.getSessionID();
+//			BookDTO book = bookDAO.getBooks().get(selectedBookName);
+//			if(sessionID != null) {
+//				// 접속한 아이디로 해당 책이 대여중일 경우 반납 버튼 활성화
+//				if(sessionID.equals(book.getRentaledByWho())) { // sessionID 를 앞에 쓴 이유는 book.getRentaledByWho() 가 null 일 경우를 대비해서
+//					returnBtn.setEnabled(true);
+//				}
+//				// 접속한 아이디로 해당 책이 예약중일 경우 예약취소 버튼 활성화
+//				if(sessionID.equals(book.getReservedByWho())) {
+//					reserveCancleBtn.setEnabled(true);
+//				}
+//			}
 			
 		}
 	}
